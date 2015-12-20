@@ -5,4 +5,5 @@ Splits the docx into chapters in epub at headings marked with "Otsikko"-style.
 
 ###USAGE
 from command line ./muunnos.sh input.docx [output_name] [cover_image.jpeg]
+
 Requires shell-environment, awk and python.

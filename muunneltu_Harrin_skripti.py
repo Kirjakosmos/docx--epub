@@ -1,4 +1,3 @@
-#Harrin skripti, sorkittuna. Muutokset on merkitty kommentein. MP 27.7.2015
 import zipfile
 import argparse
 import os
@@ -17,7 +16,7 @@ index_tpl = '''<package version="2.0" xmlns="http://www.idpf.org/2007/opf" uniqu
   <spine xmlns="http://www.idpf.org/2007/opf" toc="ncx">
     %(spine)s
   </spine>
-</package>'''  #puuttui vaaditut unique-identifier ja <dc:identifier
+</package>'''
 
 toc_tpl = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN"
@@ -49,14 +48,14 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("input")
-    parser.add_argument("--styles")   #uutta, annetaan tyylitiedoston nimi, identifier parametreina
+    parser.add_argument("--styles")
     parser.add_argument("--identifier")
     parser.add_argument("--lang", default="fi")
     parser.add_argument("--title", default="nimi puuttuu")
     parser.add_argument("--authors", default="tuntematon")
     parser.add_argument("--output")
-    parser.add_argument("--otsikot") #uutta
-    parser.add_argument("--kansikuva") #uutta
+    parser.add_argument("--otsikot")
+    parser.add_argument("--kansikuva")
 
     args = parser.parse_args()
     output = "out.epub"
@@ -64,7 +63,7 @@ def main():
         output = args.output
     epub = zipfile.ZipFile(output, 'w')
     epub.writestr("mimetype", "application/epub+zip")
-    epub.writestr(  #pari rivinvaihtoa alusta pois
+    epub.writestr(
         "META-INF/container.xml",
         '''<?xml version="1.0"?>
 <container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
@@ -74,31 +73,31 @@ def main():
     </rootfiles>
 </container>''')
 
-    if args.otsikot:  ###
+    if args.otsikot:
         with open(args.otsikot, 'r') as tiedostossa:
             luetut = tiedostossa.read()
             lukujen_nimet = luetut.splitlines()
-    manifest = '<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>'  #Puuttui toc.ncx
+    manifest = '<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>'
     if args.styles:
-        manifest += '\n    <item id="stylesheet" href="css/style.css" media-type="text/css"/>' #Laitetaan tyylitiedosto manifestiin
-    if args.kansikuva:   #laittaa kansikuvan mukaan epubiin
+        manifest += '\n    <item id="stylesheet" href="css/style.css" media-type="text/css"/>'
+    if args.kansikuva:
         epub.write(args.kansikuva, 'OEBPS/%s' % args.kansikuva)
         manifest += '\n    <item id="cover" href="OEBPS/%s" media-type="image/jpeg"/>' % args.kansikuva
     spine = ""
-    navpointit = ""  #toc.ncx vaatii 
+    navpointit = ""
     for directory, _, files in os.walk(args.input):
         for i, html in enumerate(files):
-            otsikko = i + 1   ###
-            if args.otsikot:   ###
-                otsikko = lukujen_nimet[i + 1]   ###
-            basename = os.path.basename(directory + html) #Vanhentui
-            manifest += '\n    <item id="file_%s" href="%s.xhtml" media-type="application/xhtml+xml" />' % (i + 1, i + 1) #Ei etsi tiedostoja, vaan olettaa kaikkien olevan muotoa 1.xhtml, 2.xhtml jne.
+            otsikko = i + 1
+            if args.otsikot:
+                otsikko = lukujen_nimet[i + 1]
+            basename = os.path.basename(directory + html)
+            manifest += '\n    <item id="file_%s" href="%s.xhtml" media-type="application/xhtml+xml" />' % (i + 1, i + 1)
             spine += '\n    <itemref idref="file_%s" />' % (i + 1)
             navpointit += '''    <navPoint id="file_%s" playOrder="%s">
       <navLabel><text>%s</text></navLabel>
       <content src="%s.xhtml" />
     </navPoint>
-''' % (i + 1, i + 1, otsikko, i + 1)  ### otsikko / i + 1
+''' % (i + 1, i + 1, otsikko, i + 1)
             epub.write("%s/%s" % (directory, html), 'OEBPS/' + basename)
             
     epub.writestr(
@@ -111,12 +110,12 @@ def main():
             'spine': spine,
             'identifier': args.identifier,
         }
-    )   #identifier uusi
+    )
 
-    if args.styles:   #laittaa tyylit mukaan epubiin
+    if args.styles:
         epub.write(args.styles, 'OEBPS/css/style.css')
 
-    epub.writestr(  #puuttui toc.ncx
+    epub.writestr(
         "OEBPS/toc.ncx",
         toc_tpl % {
         'authors': args.authors,

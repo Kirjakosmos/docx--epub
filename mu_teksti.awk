@@ -16,13 +16,11 @@ BEGIN {
 
 NR == 1      {tiedosto = kansio tiedosto; tiedoston_alkutekstit(tiedosto)}
 NR == 1      { if (kansikuva != "" ){
-print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto ;
-otsikko = otsikko "" kansikuva "" ;
-        print otsikko "\n" > otsikkokansio "otsikot"
-        otsikko = ""
-tiedostonro++ ;
-close(tiedosto) ;
-tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio) ;
+  print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
+  print "\n" substr(kansikuva,1,length(kansikuva)-4) >> otsikkokansio "otsikot"
+  tiedostonro++
+  close(tiedosto)
+  tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
 }
 }
 
@@ -34,6 +32,9 @@ rungossa == "" {next}
 
 /PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
 /TOC \\/  {$1 = ""}
+
+/wp:align$/ { next }  # kuvien asemoinnit menee muuten tekstiksi
+
 
 NF>1         { 
     if (seuraavana_otsikko == "jep"){

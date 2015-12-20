@@ -7,7 +7,7 @@ BEGIN {
 }
 
 #Otsikot
-/w:style.*paragraph.*styleId=\"[Hh]eading1\"/ || /w:style.*paragraph.*styleId=\"[Oo]tsikko[ 1]?\"/ {
+/w:style.*paragraph.*styleId=\"[Oo]tsikko[ 1]?\"/ {
     css = css "p.h1 {"
     kirjoitetaan = "joo"
 }
