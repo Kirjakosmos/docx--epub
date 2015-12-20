@@ -1,5 +1,5 @@
 #!/usr/bin/awk -f
-#Ohjelma muuntaa Wordin xml-tiedoston xhtml-tiedostoiksi. Saa syötteenä arvon kansio, johon valmiit xhtml:t kirjoitetaan, ja otsikkokansio, jonne otsikot kerätään.
+#Ohjelma muuntaa Wordin xml-tiedoston xhtml-tiedostoiksi.
 
 BEGIN {
     OFS = ""
@@ -24,20 +24,22 @@ NR == 1      { if (kansikuva != "" ){
 }
 }
 
-/body/       {rungossa = "jep!"; next}
+/body/       {rungossa = "jep!"}
 
 rungossa == "" {next}  
 
-/\r/         {gsub(/\r/,"<br/>",$1)}
+/[^ ]\r[^ ]/ {gsub(/\r[^ ]/, " &", $1)}
+/\r/         {gsub(/\r/, "<br/>", $1)}
 
 /PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
 /TOC \\/  {$1 = ""}
-
-/wp:align$/ { next }  # kuvien asemoinnit menee muuten tekstiksi
+/w:instrText/ { $1 = "" }
+/wp:align$/ { $1 = "" }
 
 
 NF>1         { 
     if (seuraavana_otsikko == "jep"){
+        if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "}
         otsikko = otsikko "" $1 
     }    
     kirjoitettava = kirjoitettava  $1 "\n"; $0 = $2;
@@ -45,7 +47,7 @@ NF>1         {
 
 /^w:p[ ](.)*\/$/  {kirjoitettava = kirjoitettava "<p><br/></p>"; next}
 
-#uusi luku
+# uusi luku
 /:pStyle w:val=\"[Hh]eading1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
      kirjoitettava = kirjoitettava "</p>"
      seuraavana_otsikko = "jep"
@@ -57,11 +59,11 @@ NF>1         {
      kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
 
-#Väliotsikko
+# väliotsikko
 /:pStyle w:val=\"Heading2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
      kirjoitettava = kirjoitettava "</p><p class=\"h2\">" }
 
-#Itse määriteltävät tyylit.
+# itse määriteltävät tyylit
 /:pStyle w:val=\"[Tt]yyli( )?2/ || /:pStyle w:val=\"[Ss]tyle2\"/  {
      kirjoitettava = kirjoitettava "</p><p class=\"tyyli2\">" }
 /:pStyle w:val=\"[Tt]yyli( )?3/ || /:pStyle w:val=\"[Ss]tyle3\"/  {
@@ -71,25 +73,27 @@ NF>1         {
 /:pStyle w:val=\"[Tt]yyli( )?5/ || /:pStyle w:val=\"[Ss]tyle5\"/  {
      kirjoitettava = kirjoitettava "</p><p class=\"tyyli5\">" }
 
-#Rivinvaihto
+# rivinvaihto
 /w:br\// {kirjoitettava = kirjoitettava "<br/>"}
 
-#kappale
+# kappale
 /^w:p$/ || /^w:p w/   {kirjoitettava = kirjoitettava "<p>"}
 /\/w:p$/      {kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
     if (seuraavana_otsikko == "jep"){
-        print otsikko "\n" >> otsikkokansio "otsikot"
+        gsub("(\n)+"," ",otsikko)
+        otsikko = "\n" otsikko
+        print otsikko "" >> otsikkokansio "otsikot"
         otsikko = seuraavana_otsikko = ""
     }
 }
 
-#lihavointi                muuttuja "suljettavat" on käytössä, sillä wordin xml ei sulje tyylittelyjä
+# lihavointi
 /w:b\//       {kirjoitettava = kirjoitettava "<b>"
                suljettavat = "</b>" suljettavat}
-#kursiivi
+# kursiivi
 /w:i\//       {kirjoitettava = kirjoitettava "<i>"
     suljettavat = "</i>" suljettavat}
-#alleviivaus
+# alleviivaus
 /w:u(.)*\//       {kirjoitettava = kirjoitettava "<u>"
     suljettavat = "</u>" suljettavat}
 
@@ -101,9 +105,9 @@ END {
     if (eka=="") {virheet = virheet  "Huom! Asiakirjasta ei löytynyt lainkaan otsikoita.\n"}
     luku_loppuu(tiedosto, suljettavat, kirjoitettava)
     if (virheet == ""){
-        print "\nVaihe b) onnistui: tiedoston teksti luettiin.\n"
+        print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
     } else {
-        print "\nVaiheessa b) seuraavat virheet:\n" virheet
+        print "\nTiedoston tekstin lukemisessa kohdattiin seuraavat virheet:\n" virheet
     }
 }
 

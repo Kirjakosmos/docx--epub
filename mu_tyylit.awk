@@ -1,25 +1,25 @@
 #!/usr/bin/awk -f
-# Kirjoittaa epubin tyylitiedoston syötteen perusteella. Syötteessä arvo muuttujalle "kansio", jonka nimeämään kansioon tuotos kirjoitetaan.
+
 BEGIN {
     RS = "><"
     ORS = " "
     css = ""
 }
 
-#Otsikot
-/w:style.*paragraph.*styleId=\"[Oo]tsikko[ 1]?\"/ {
+# otsikot
+/w:style.*paragraph.*styleId=\"[Oo]tsikko\"/ {
     css = css "p.h1 {"
     kirjoitetaan = "joo"
 }
 
-#Alaotsikot
+# alaotsikot
 /w:style.*paragraph.*styleId=\"[Hh]eading2\"/ || /w:style.*paragraph.*styleId=\"[Oo]tsikko( )?2\"/ {
     css = css "p.h2 {"
     kirjoitetaan = "joo"
 }
 
-#Vapaasti määriteltävät ylimääräiset tyylit
-/w:style.*paragraph.*styleId=\"[Tt]yyli( )?2\"/ || /w:style.*paragraph.*styleId=\"[Ss]tyle2\"/ {
+# vapaasti määriteltävät ylimääräiset tyylit
+/w:style.*paragraph.*styleId=\"[Tt]yyli( )?2\"/ || /w:style.*paragraph.*styleId=\"[Ss]tyle( )?2\"/ {
     css = css "p.tyyli2 {"
     kirjoitetaan = "joo"
 }
@@ -32,39 +32,41 @@ BEGIN {
     kirjoitetaan = "joo"
 }
 
-#leipäteksti
-/w:style.*paragraph.*styleId=\"[Ll]eip[äa]teksti\"/ {
+# leipäteksti
+/w:style.*paragraph.*styleId=\"[Ll]eip[äa]?teksti\"/ {
     css = css "p {"
     kirjoitetaan = "joo"
 }
 
 {if (kirjoitetaan != "joo") {next}}
-#Tästä eteenpäin mennään vain, jos luetaan tunnistettua tyyliä.
+# Tästä eteenpäin mennään vain, jos luetaan tunnistettua tyyliä.
 
-#fonttikoko
-/w:sz (.)*val=/ {match($0, /val=\"[0-9]*\"/); koko = substr($0,RSTART+5,RLENGTH-6); koko = koko/24*100 ; css = css "font-size: " koko  "%;\n"}
+# fonttikoko
+/w:sz (.)*val=/ { koko = kaiva_arvo($0,"val")/24*100 ; css = css "font-size: " koko  "% ;\n"}
 
-#tekstin ryhmittäminen
-/:jc w:val=\"center\"/ {css = css "text-align: center;"}
-/:jc w:val=\"right\"/ {css = css "text-align: right;"}
-/:jc w:val=\"left\"/ {css = css "text-align: left;"}
-/:jc w:val=\"both\"/ {css = css "text-align: justify;"}
+# tekstin ryhmittäminen
+/:jc w:val=\"center\"/ {css = css "text-align: center ;\n"}
+/:jc w:val=\"right\"/ {css = css "text-align: right ;\n"}
+/:jc w:val=\"left\"/ {css = css "text-align: left ;\n"}
+/:jc w:val=\"both\"/ {css = css "text-align: justify ;\n"}
 
-#sisennys
-/\/w:ind w:left=\"[^0"]+/ {css = css "margin-left: 0.6em\n"}
+# sisennys
+/(\/)?w:ind w:left=\"[^0"]+/ {arvo = kaiva_arvo( $0, "left" ) / 100 ; css = css "margin-left: " arvo "em ;\n"}
 
-#välistys
-/spacing(.)*w:line=\"[1-9]+/ {css = css "line-height: 1.0 ;\n"}
+# välistys
+/spacing(.)*lineRule=\"auto(.)*w:line=\"[1-9]+/ {arvo = kaiva_arvo( $0, "line") / 240 ; css = css "line-height: " arvo " ;\n"}
+/spacing(.)*lineRule=\"atLeast(.)*w:line=\"[1-9]+/ {arvo = kaiva_arvo( $0, "line") / 567 ; css = css "line-height: " arvo " ;\n"}
 
-#kappaleenvälit
-/spacing(.)*w:before=\"[1-9]+/ {css = css "margin-top: 0.6em ;\n"}
-/spacing(.)*w:after=\"[1-9]+/ {css = css "margin-bottom: 0.6em ;\n"}
+# kappaleenvälit
+/spacing(.)*w:before=\"[1-9]+/ {arvo = kaiva_arvo( $0, "before" ) / 567 ; css = css "margin-top: " arvo "em ;\n"}
+/spacing(.)*w:after=\"[1-9]+/ {arvo = kaiva_arvo($0, "after" ) / 567 ; css = css "margin-bottom: " arvo "em ;\n"}
 
-#lihavoinnit yms.
+# lihavoinnit yms.
 /w:b\//	{css = css "font-weight: bold ;\n"}
 /w:i\//	{css = css "font-style: italic ;\n"}
+/w:u/   {}
 
-#tyylin loppu
+# tyylin loppu
 /\/w:style/      {
     kirjoitetaan = ""
     css = css "}\n"
@@ -72,15 +74,22 @@ BEGIN {
 
 END {
     if (kirjoitetaan=="joo") {
-        print "\nTyylitiedostossa on virhe.\n"
+        print "\nSyötteen tyyleissä on virhe.\n"
     } else {
         print "\nVaihe a) onnistui: tyylitiedosto luotiin."
     }
-#Lisätään vielä muutama suositeltu muotoilu.
-    css = "\n@page { margin: 5pt; }\n" css
-    css = " p { text-indent: 1.5em;\n margin-top: 0.1em; }\n" css
-    css = " p.eka { text-indent: 0em;\n margin-top: 0.6em; }\n" css
-    css = " html, body { height: 100%; margin: 0; padding: 0; border-width: 0; }\n" css
+# Lisätään vielä muutama suositeltu muotoilu.
+    css = "\n@page { margin: 5pt ; }\n" css
+    css = " p { text-indent: 1.5em;\n margin-top: 0.1em ; }\n" css
+    css = css " p.eka { text-indent: 0em;\n margin-top: 0.6em ; }"
+    css = " html, body { height: 100% ;\n margin: 0 ;\n padding: 0 ;\n border-width: 0 ;\n }\n" css
     tiedosto = kansio "tyylit.css"
     print css > tiedosto
+}
+
+# kaivaa riviltä muuttuja="luku" -kohdasta annettua muuttujaa vastaavan luvun
+function kaiva_arvo( rivi, muuttuja ){
+match(rivi, muuttuja "=\"[0-9]*\"")
+arvo = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 -length(muuttuja) )
+return(arvo + 0)
 }

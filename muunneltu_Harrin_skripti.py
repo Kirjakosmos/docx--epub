@@ -125,5 +125,7 @@ def main():
         }
     )
 
+    print "Vaihe d) onnistui: epub luotiin."
+
 if __name__ == '__main__':
     main()
