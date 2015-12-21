@@ -10,6 +10,7 @@ BEGIN {
 END {
     if (!index(komento,"--title")){
         gsub(/\.doc[x]?/,"",nimi)
+        gsub(/^(.)*\//,"",nimi)
         komento = komento " --title '" nimi "'"
     }
     if (otsikot != "") {

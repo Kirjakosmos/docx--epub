@@ -17,7 +17,10 @@ BEGIN {
 NR == 1      {tiedosto = kansio tiedosto; tiedoston_alkutekstit(tiedosto)}
 NR == 1      { if (kansikuva != "" ){
   print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
-  print "\n" substr(kansikuva,1,length(kansikuva)-4) >> otsikkokansio "otsikot"
+  kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
+  gsub("^(.)*\/", "", kannen_nimi )
+  print "\n" kannen_nimi >> otsikkokansio "otsikot"
+
   tiedostonro++
   close(tiedosto)
   tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
