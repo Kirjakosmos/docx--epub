@@ -3,4 +3,4 @@
  * rivinvälien yms. arvojen yhteydessä käytettävien yksiköiden tarkostaminen
  * ~~kansikuvalle nimi epubin hakemistoon (nykyinen toteutus ei toimi)~~ toimii
  * kuvat tekstissä (liian suuritöinen, ehkä?)
-
+ * alaviitteet

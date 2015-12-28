@@ -13,8 +13,20 @@ BEGIN {
 }
 
 # alaotsikot
-/w:style.*paragraph.*styleId=\"[Hh]eading2\"/ || /w:style.*paragraph.*styleId=\"[Oo]tsikko( )?2\"/ {
+/w:style.*paragraph.*styleId=\"[Oo]tsikko( )?2\"/ {
     css = css "p.h2 {"
+    kirjoitetaan = "joo"
+}
+/w:style.*paragraph.*styleId=\"[Oo]tsikko( )?3\"/ {
+    css = css "p.h3 {"
+    kirjoitetaan = "joo"
+}
+/w:style.*paragraph.*styleId=\"[Hh]eading4\"/ || /w:style.*paragraph.*styleId=\"[Oo]tsikko( )?4\"/ {
+    css = css "p.h4 {"
+    kirjoitetaan = "joo"
+}
+/w:style.*paragraph.*styleId=\"[Hh]eading5\"/ || /w:style.*paragraph.*styleId=\"[Oo]tsikko( )?5\"/ {
+    css = css "p.h5 {"
     kirjoitetaan = "joo"
 }
 
@@ -29,6 +41,10 @@ BEGIN {
 }
 /w:style.*paragraph.*styleId=\"[Tt]yyli( )?4\"/ || /w:style.*paragraph.*styleId=\"[Ss]tyle4\"/ {
     css = css "p.tyyli4 {"
+    kirjoitetaan = "joo"
+}
+/w:style.*paragraph.*styleId=\"[Tt]yyli( )?5\"/ || /w:style.*paragraph.*styleId=\"[Ss]tyle5\"/ {
+    css = css "p.tyyli5 {"
     kirjoitetaan = "joo"
 }
 

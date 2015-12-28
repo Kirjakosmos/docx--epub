@@ -51,7 +51,7 @@ NF>1         {
 /^w:p[ ](.)*\/$/  {kirjoitettava = kirjoitettava "<p><br/></p>"; next}
 
 # uusi luku
-/:pStyle w:val=\"[Hh]eading1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
+/:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
      kirjoitettava = kirjoitettava "</p>"
      seuraavana_otsikko = "jep"
      if (eka=="mennyt"){
@@ -63,8 +63,14 @@ NF>1         {
 }
 
 # väliotsikko
-/:pStyle w:val=\"Heading2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
+/:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
      kirjoitettava = kirjoitettava "</p><p class=\"h2\">" }
+/:pStyle w:val=\"Heading( )?3/ || /:pStyle w:val=\"[Oo]tsikko( )?3\"/  {
+     kirjoitettava = kirjoitettava "</p><p class=\"h3\">" }
+/:pStyle w:val=\"Heading( )?4/ || /:pStyle w:val=\"[Oo]tsikko( )?4\"/  {
+     kirjoitettava = kirjoitettava "</p><p class=\"h4\">" }
+/:pStyle w:val=\"Heading( )?5/ || /:pStyle w:val=\"[Oo]tsikko( )?5\"/  {
+     kirjoitettava = kirjoitettava "</p><p class=\"h5\">" }
 
 # itse määriteltävät tyylit
 /:pStyle w:val=\"[Tt]yyli( )?2/ || /:pStyle w:val=\"[Ss]tyle2\"/  {
@@ -87,6 +93,7 @@ NF>1         {
         otsikko = "\n" otsikko
         print otsikko "" >> otsikkokansio "otsikot"
         otsikko = seuraavana_otsikko = ""
+	eka = "mennyt"
     }
 }
 
