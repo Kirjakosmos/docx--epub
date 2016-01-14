@@ -27,12 +27,12 @@ NR == 1      { if (kansikuva != "" ){
 }
 }
 
-/body/       {rungossa = "jep!"}
+/body/       { rungossa = "jep!" }
 
 rungossa == "" {next}  
 
-/[^ ]\r[^ ]/ {gsub(/\r[^ ]/, " &", $1)}
-/\r/         {gsub(/\r/, "<br/>", $1)}
+/[^ ]\r[^ ]/ { if (seuraavana_otsikko == "jep"){ gsub(/\r[^ ]/, " &", $1) } }
+/\r/         { gsub(/\r/, "<br/>", $1) }
 
 /PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
 /TOC \\/  {$1 = ""}
