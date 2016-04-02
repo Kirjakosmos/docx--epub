@@ -167,7 +167,8 @@ function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
     gsub(/>[\n]+</,">\n<",kirjoitettava)
     gsub(/<p[^h>]*>/,"&\r",kirjoitettava)
     gsub(/class=\"h[1-9]?\"[^\r]+<p/,"& class=\"eka\"",kirjoitettava)
-    gsub(/class=\"eka\"[^<>\"]+class=\"[^<>]*\"/," class=\"eka\"",kirjoitettava)
+#    gsub(/class=\"eka\"[^<>\"]+class=\"[^<>]*\"/," class=\"eka\"",kirjoitettava)
+    gsub(/class=\"eka\"[^<>\"]+class=\"/," class=\"",kirjoitettava)
     gsub(/\r/,"",kirjoitettava)
     gsub(/\n[\n]{1,}/,"\n",kirjoitettava)
     #Sitten kirjoitetaan tiedostoon.

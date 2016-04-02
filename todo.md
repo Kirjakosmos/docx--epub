@@ -8,3 +8,4 @@
  * otsikoiden tunnistaminen tekstin sekaan liitetyllä tunnisteella (esim. merkintöjen **"*/ ja */*"* välissä oleva teksti tulkitaan muuntaessa otsikoksi)
  * numeroidut listat (mu_numerointi.awk, joka lukee numbering.xml:n?)
  * toisille tyyleille pohjaavien tyylien luominen oikein
+ * muotoillulla tyylillä alkavan luvun alkuun ekat kappaleet oikein
