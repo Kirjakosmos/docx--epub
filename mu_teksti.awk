@@ -88,6 +88,7 @@ NF>1         {
 # rivinvaihto
 /w:br\// {kirjoitettava = kirjoitettava "<br/>"}
 
+#lista, ei lopullinen
 /w:numId w:val=/  {
     lista++
     kirjoitettava = kirjoitettava " " lista ". "
@@ -164,8 +165,9 @@ function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
     gsub(/><\/p/,">\n</p",kirjoitettava)
     while (gsub(/<p>[\n]*<\/p>/,"",kirjoitettava)) { }
     gsub(/>[\n]+</,">\n<",kirjoitettava)
-    gsub(/<p>/,"<p>\r",kirjoitettava)
+    gsub(/<p[^h>]*>/,"&\r",kirjoitettava)
     gsub(/class=\"h[1-9]?\"[^\r]+<p/,"& class=\"eka\"",kirjoitettava)
+    gsub(/class=\"eka\"[^<>\"]+class=\"[^<>]*\"/," class=\"eka\"",kirjoitettava)
     gsub(/\r/,"",kirjoitettava)
     gsub(/\n[\n]{1,}/,"\n",kirjoitettava)
     #Sitten kirjoitetaan tiedostoon.
