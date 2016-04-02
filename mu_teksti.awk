@@ -12,6 +12,7 @@ BEGIN {
     virheet = ""  
     kirjoitettava = ""
     seuraavana_otsikko = "jep"
+    raportointi = 5000;
 }
 
 NR == 1      {tiedosto = kansio tiedosto; tiedoston_alkutekstit(tiedosto)}
@@ -30,6 +31,8 @@ NR == 1      { if (kansikuva != "" ){
 /body/       { rungossa = "jep!" }
 
 rungossa == "" {next}  
+
+NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
 
 /[^ ]\r[^ ]/ { if (seuraavana_otsikko == "jep"){ gsub(/\r[^ ]/, " &", $1) } }
 /\r/         { gsub(/\r/, "<br/>", $1) }
@@ -84,6 +87,12 @@ NF>1         {
 
 # rivinvaihto
 /w:br\// {kirjoitettava = kirjoitettava "<br/>"}
+
+/w:numId w:val=/  {
+    lista++
+    kirjoitettava = kirjoitettava " " lista ". "
+    if (seuraavana_otsikko == "jep") { otsikko = otsikko " " lista ". "}
+    }
 
 # kappale
 /^w:p$/ || /^w:p w/   {kirjoitettava = kirjoitettava "<p>"}
