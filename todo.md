@@ -11,3 +11,4 @@
  * muotoillulla tyylillä alkavan luvun alkuun ekat kappaleet oikein
  * sivunumeroiden automaattinen poistaminen
  * huonosti muotoiltujen tiedostojen käsitteleminen niin, ettei päädytä eri määrään lukuja ja otsikoita
+ * käytettäville tyyleille omat nimet, sillä nykyisellään menevät päälle kiinteästi määrättyjen kanssa (ei voi yksinkertaisesti uudelleennimetä tyylejään, kun nimet ovatkin jo varattuja)

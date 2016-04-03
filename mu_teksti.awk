@@ -21,6 +21,7 @@ NR == 1      { if (kansikuva != "" ){
   kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
   gsub("^(.)*\/", "", kannen_nimi )
   print "\n" kannen_nimi >> otsikkokansio "otsikot"
+  print "Käytetään kantta " kansikuva
 
   tiedostonro++
   close(tiedosto)

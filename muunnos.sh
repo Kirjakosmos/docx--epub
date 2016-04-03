@@ -10,6 +10,14 @@
   mkdir $kirjoituskansio
   mkdir $tyylikansio
   unzip -qq $1 -d $va_kansio
+
+  if [ -f ${va_kansio}word/footer1.xml ];
+  then
+      echo "Varoitus: tiedostossa on sivunumerot (tai muu alatunniste) käytössä!"
+      echo "Yritetään poistamista."
+      rm ${va_kansio}word/footer1.xml
+  fi
+
   ./mu_tyylit.awk kansio="${tyylikansio}" ${va_kansio}word/styles.xml
   ./mu_teksti.awk kansio="${kirjoituskansio}" otsikkokansio="${tyylikansio}" kansikuva="${3:-""}" ${va_kansio}word/document.xml
   tunniste=um${$}t$(date +%s)
