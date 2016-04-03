@@ -21,7 +21,6 @@ NR == 1      { if (kansikuva != "" ){
   kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
   gsub("^(.)*\/", "", kannen_nimi )
   print "\n" kannen_nimi >> otsikkokansio "otsikot"
-  print "Käytetään kantta " kansikuva
 
   tiedostonro++
   close(tiedosto)
@@ -169,7 +168,7 @@ function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
     gsub(/<p[^h>]*>/,"&\r",kirjoitettava)
     gsub(/class=\"h[1-9]?\"[^\r]+<p/,"& class=\"eka\"",kirjoitettava)
 #    gsub(/class=\"eka\"[^<>\"]+class=\"[^<>]*\"/," class=\"eka\"",kirjoitettava)
-    gsub(/class=\"eka\"[^<>\"]+class=\"/," class=\"",kirjoitettava)
+    gsub(/class=\"eka\"[^<>\"]+class=\"/," class=\"eka",kirjoitettava)
     gsub(/\r/,"",kirjoitettava)
     gsub(/\n[\n]{1,}/,"\n",kirjoitettava)
     #Sitten kirjoitetaan tiedostoon.
