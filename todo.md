@@ -5,10 +5,11 @@
  * kuvat tekstissä (liian suuritöinen, ehkä?)
  * alaviitteet
  * teksti- tai rtf-muotoisten asiakirjojen kääntäminen, lähinnä seuraava:
- * otsikoiden tunnistaminen tekstin sekaan liitetyllä tunnisteella (esim. merkintöjen **"*/ ja */*"* välissä oleva teksti tulkitaan muuntaessa otsikoksi)
+ * ~~otsikoiden tunnistaminen tekstin sekaan liitetyllä tunnisteella (esim. merkintöjen **"*/ ja */*"* välissä oleva teksti tulkitaan muuntaessa otsikoksi)~~ Nyt rivit, joilla on merkkijono ???o??? tulee poimituksi otsikoksi
  * numeroidut listat (mu_numerointi.awk, joka lukee numbering.xml:n?)
  * toisille tyyleille pohjaavien tyylien luominen oikein
- * muotoillulla tyylillä alkavan luvun alkuun ekat kappaleet oikein
- * sivunumeroiden automaattinen poistaminen
+ * ~~muotoillulla tyylillä alkavan luvun alkuun ekat kappaleet oikein~~
+ * ~~sivunumeroiden automaattinen poistaminen~~
  * huonosti muotoiltujen tiedostojen käsitteleminen niin, ettei päädytä eri määrään lukuja ja otsikoita
  * käytettäville tyyleille omat nimet, sillä nykyisellään menevät päälle kiinteästi määrättyjen kanssa (ei voi yksinkertaisesti uudelleennimetä tyylejään, kun nimet ovatkin jo varattuja)
+ * asiakirjassa kaytettyjen tyylien kaivaminen etukateen nimettyjen asemesta

@@ -17,15 +17,15 @@ BEGIN {
 
 NR == 1      {tiedosto = kansio tiedosto; tiedoston_alkutekstit(tiedosto)}
 NR == 1      { if (kansikuva != "" ){
-  print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
-  kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
-  gsub("^(.)*\/", "", kannen_nimi )
-  print "\n" kannen_nimi >> otsikkokansio "otsikot"
+	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
+	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
+	gsub("^(.)*\/", "", kannen_nimi )
+	print "\n" kannen_nimi >> otsikkokansio "otsikot"
 
-  tiedostonro++
-  close(tiedosto)
-  tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-}
+	tiedostonro++
+	close(tiedosto)
+	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+    }
 }
 
 /body/       { rungossa = "jep!" }
@@ -42,12 +42,24 @@ NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
 /w:instrText/ { $1 = "" }
 /wp:align$/ { $1 = "" }
 
+/¤¤¤o¤¤¤/   { seuraavana_otsikko = "jep"
+    gsub(/¤¤¤o¤¤¤/, "", $0)
+    if (eka=="mennyt"){
+	tiedostonro++;
+	gsub(/<p>$/,"",kirjoitettava)
+	if (kirjoitettava != "") {luku_loppuu(tiedosto, suljettavat,kirjoitettava)}
+	suljettavat=""; kirjoitettava=""
+	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+    } else {eka = "mennyt"}
+    kirjoitettava = kirjoitettava "<p>"
+}
 
 NF>1         { 
-    if (seuraavana_otsikko == "jep"){
-        if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "}
+    if (seuraavana_otsikko == "jep") {
+        if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "
+	}
         otsikko = otsikko "" $1 
-    }    
+    } 
     kirjoitettava = kirjoitettava  $1 "\n"; $0 = $2;
 }
 
