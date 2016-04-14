@@ -111,7 +111,7 @@ END {
     css = " p { text-indent: 1.5em;\n margin-top: 0.1em ; }\n" css
     css = css " p.eka { text-indent: 0em;\n margin-top: 0.6em ; }"
     css = " html, body { height: 100% ;\n margin: 0 ;\n padding: 0 ;\n border-width: 0 ;\n }\n" css
-    tiedosto = kansio "tyylit.css"
+    tiedosto = kansio "/tyylit.css"
     gsub(/ekatyyli[1-9]?[ ]?{/,"& \r" , ekat_versiot)
     gsub(/^[^\r]*ekatyyli1[ ]?{/, "& text-indent: 0em;\n", ekat_versiot)
     gsub(/^[^\r]*ekatyyli2[ ]?{/, "& text-indent: 0em;\n", ekat_versiot)
@@ -136,7 +136,7 @@ END {
 
 # kaivaa riviltä muuttuja="luku" -kohdasta annettua muuttujaa vastaavan luvun
 function kaiva_arvo( rivi, muuttuja ){
-match(rivi, muuttuja "=\"[0-9]*\"")
-arvo = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 -length(muuttuja) )
-return(arvo + 0)
+    match(rivi, muuttuja "=\"[0-9]*\"")
+    arvo = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 -length(muuttuja) )
+    return(arvo + 0)
 }

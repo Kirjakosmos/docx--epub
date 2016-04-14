@@ -13,4 +13,7 @@
  * huonosti muotoiltujen tiedostojen käsitteleminen niin, ettei päädytä eri määrään lukuja ja otsikoita
  * käytettäville tyyleille omat nimet, sillä nykyisellään menevät päälle kiinteästi määrättyjen kanssa (ei voi yksinkertaisesti uudelleennimetä tyylejään, kun nimet ovatkin jo varattuja)
  * asiakirjassa kaytettyjen tyylien kaivaminen etukateen nimettyjen asemesta
- * ##python-skriptin korvaaminen awkilla ja kutsulla zip:ille (unzip on jo alussa mukana)
+ * ~~python-skriptin korvaaminen awkilla ja kutsulla zip:ille (unzip on jo alussa mukana)~~
+ * shell-komennot awk-tiedoston sis\"a\"an system()-kutsuiksi, kaikki tiedostot yhdeksi ohjelmatiedostoksi (getline < tyylit jne.)
+ * muuttujien nimien johdonmukaistaminen
+ * julkaisu

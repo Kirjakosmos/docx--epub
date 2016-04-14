@@ -1,5 +1,4 @@
 #!/usr/bin/awk -f
-#Ohjelma muuntaa Wordin xml-tiedoston xhtml-tiedostoiksi.
 
 BEGIN {
     OFS = ""
@@ -7,7 +6,6 @@ BEGIN {
     FS = "<[ ]*"
     RS = ">[<]?"
     tiedostonro = 1
-    tiedosto = tiedostonro ".xhtml"
     suljettavat = ""
     virheet = ""  
     kirjoitettava = ""
@@ -15,8 +13,8 @@ BEGIN {
     raportointi = 5000;
 }
 
-NR == 1      {tiedosto = kansio tiedosto; tiedoston_alkutekstit(tiedosto)}
-NR == 1      { if (kansikuva != "" ){
+NR == 1      { kansio = kansio "/OEBPS/"; tiedosto = kansio "1.xhtml"; tiedoston_alkutekstit(tiedosto)}
+NR == 1      { if (kansikuva) {
 	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
 	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
 	gsub("^(.)*\/", "", kannen_nimi )
