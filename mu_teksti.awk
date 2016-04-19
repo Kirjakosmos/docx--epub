@@ -1,5 +1,10 @@
 #!/usr/bin/awk -f
 
+#Tekstin hieronta omaksi funktiokseen!
+#Hieronnan jalkeen tarkistus, onko mitaan kirjoitettavaa. 
+#Tiedostonumeron kasvattaminen vasta tarkastusten jalkeen.
+
+
 BEGIN {
     OFS = ""
     ORS = ""
@@ -33,7 +38,7 @@ rungossa == "" {next}
 NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
 
 /[^ ]\r[^ ]/ { if (seuraavana_otsikko == "jep"){ gsub(/\r[^ ]/, " &", $1) } }
-/\r/         { gsub(/\r/, "<br/>", $1) }
+/\r/         { gsub(/\r/, "<br />", $1) }
 
 /PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
 /TOC \\/  {$1 = ""}
@@ -43,11 +48,16 @@ NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
 /¤¤¤o¤¤¤/   { seuraavana_otsikko = "jep"
     gsub(/¤¤¤o¤¤¤/, "", $0)
     if (eka=="mennyt"){
-	tiedostonro++;
 	gsub(/<p>$/,"",kirjoitettava)
-	if (kirjoitettava != "") {luku_loppuu(tiedosto, suljettavat,kirjoitettava)}
+	if (kirjoitettava) {
+	    kirjoitettava = hieronta(kirjoitettava, suljettavat)
+	    if (kirjoitettava ~ "[^ \t\n\r]+") {
+		luku_loppuu(tiedosto, suljettavat,kirjoitettava)
+		tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+		tiedostonro++;
+	    }
+	}
 	suljettavat=""; kirjoitettava=""
-	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
     } else {eka = "mennyt"}
     kirjoitettava = kirjoitettava "<p>"
 }
@@ -61,16 +71,21 @@ NF>1         {
     kirjoitettava = kirjoitettava  $1 "\n"; $0 = $2;
 }
 
-/^w:p[ ](.)*\/$/  {kirjoitettava = kirjoitettava "<p><br/></p>"; next}
+/^w:p[ ](.)*\/$/  {kirjoitettava = kirjoitettava "<p><br /></p>"; next}
 
 # uusi luku
 /:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
      kirjoitettava = kirjoitettava "</p>"
      seuraavana_otsikko = "jep"
      if (eka=="mennyt"){
-         tiedostonro++;
-         luku_loppuu(tiedosto, suljettavat,kirjoitettava); suljettavat=""; kirjoitettava=""
-         tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+	 kirjoitettava = hieronta(kirjoitettava, suljettavat)
+	 if (kirjoitettava ~ "[^ \n\r\t]+") {
+	     tiedostonro++;
+	     luku_loppuu(tiedosto, suljettavat,kirjoitettava)
+	     suljettavat=""
+	     kirjoitettava=""
+	     tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+	 }
      } else {eka = "mennyt"}
      kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
@@ -96,7 +111,7 @@ NF>1         {
      kirjoitettava = kirjoitettava "</p><p class=\"tyyli5\">" }
 
 # rivinvaihto
-/w:br\// {kirjoitettava = kirjoitettava "<br/>"}
+/w:br\// {kirjoitettava = kirjoitettava "<br />"}
 
 #lista, ei lopullinen
 /w:numId w:val=/  {
@@ -133,6 +148,7 @@ NF>1         {
 END {
     if (rungossa=="") {virheet = virheet  "Asiakirjalla ei ollut \"<body> ... </body>\"-rakennetta.\n"}
     if (eka=="") {virheet = virheet  "Huom! Asiakirjasta ei löytynyt lainkaan otsikoita.\n"}
+    kirjoitettava = hieronta(kirjoitettava, suljettavat)
     luku_loppuu(tiedosto, suljettavat, kirjoitettava)
     if (virheet == ""){
         print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
@@ -147,23 +163,21 @@ function tiedoston_alkutekstit(tiedosto) {
     print "\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" >> tiedosto
     print  "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n" >> tiedosto
     print "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n<title>" tiedostonro  >> tiedosto
-    print "</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />\n</head>" >> tiedosto
+    print "</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tyylit.css\" />\n</head>" >> tiedosto
     print "\n<body>" >> tiedosto
 }
 
-# Tiedoston loppuun tulee päälle jääneiden tägien sulkimet. Sulkee tiedoston.
-function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
-# hierotaan tekstiä siistimmäksi
+function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
     gsub(/\n/,"",kirjoitettava)
     gsub(/>[ \s]+</,"><",kirjoitettava)
-    gsub(/<p>[ \t\f\n\r\v]*<br\/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/,"<p>\n<br/>\n",kirjoitettava)  
-    while (gsub(/<b><\/b>/,"",kirjoitettava) || gsub(/<i><\/i>/,"",kirjoitettava)) {    }
-    while (gsub(/<\/i><i>/,"",kirjoitettava) || gsub(/<\/b><b>/,"",kirjoitettava)) { }
+    gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/,"<p>\n<br />\n",kirjoitettava)  
     gsub(/<i>(<i>)+/,"<i>",kirjoitettava)
     gsub(/<b>(<b>)+/,"<b>",kirjoitettava)
     gsub(/<\/i>(<\/i>)+/,"</i>",kirjoitettava)
     gsub(/<\/b>(<\/b>)+/,"</b>",kirjoitettava)
+    while (gsub(/<b><\/b>/,"",kirjoitettava) || gsub(/<i><\/i>/,"",kirjoitettava)) {    } # Ongelmia aiemmassa sijainnissa.
+    while (gsub(/<\/i><i>/,"",kirjoitettava) || gsub(/<\/b><b>/,"",kirjoitettava)) { } # Ongelmia aiemmassa sijainnissa.
     gsub(/>/,">\n",kirjoitettava)
     gsub(/</,"\n<",kirjoitettava)
     gsub(/h1\">\n/,"h1\">",kirjoitettava)
@@ -181,6 +195,11 @@ function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
     gsub(/class=\"eka\"[^<>\"]+class=\"/," class=\"eka",kirjoitettava)
     gsub(/\r/,"",kirjoitettava)
     gsub(/\n[\n]{1,}/,"\n",kirjoitettava)
+    return kirjoitettava
+}
+
+# Tiedoston loppuun tulee päälle jääneiden tägien sulkimet. Sulkee tiedoston.
+function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
     #Sitten kirjoitetaan tiedostoon.
     print kirjoitettava "</body>\n</html>" >> tiedosto
     close(tiedosto)

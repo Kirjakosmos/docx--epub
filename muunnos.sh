@@ -6,7 +6,7 @@
   mkdir $kirjoituskansio
   mkdir ${kirjoituskansio}/OEBPS
   mkdir ${kirjoituskansio}/OEBPS/css
-  mkdir ${kirjoituskansio}/MET-INF
+  mkdir ${kirjoituskansio}/META-INF
   unzip -qq $1 -d $va_kansio
 
   if [ -f ${va_kansio}word/footer1.xml ];
@@ -41,4 +41,6 @@
   else
       echo "Muunnoksessa jokin meni vikaan."
       echo "Epubia ei luotu."
+      echo "Huomaa oikea muotoilu:"
+      echo "./muunnos.sh muunnettava.docx haluttu_nimi mahdollinen_kansikuva.jpg"
   fi

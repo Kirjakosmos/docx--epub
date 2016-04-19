@@ -1,7 +1,12 @@
 #!/usr/bin/awk -f
 
+# Ei tyhjii otsikoita mukaan.
+#Ensin mimetype zipiin
+# zip -D0qn -x mimetype
+
 BEGIN {
-    tiedosto = "MET-INF/container.xml"
+    ORS = ""
+    tiedosto = "META-INF/container.xml"
     print  "<?xml version=\"1.0\"?>\n<container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">\n\n    <rootfiles>\n        <rootfile full-path=\"OEBPS/Content.opf\" media-type=\"application/oebps-package+xml\"/>\n    </rootfiles>\n</container>" >> tiedosto
     close(tiedosto)
     tiedosto = "mimetype"
@@ -9,7 +14,7 @@ BEGIN {
     close(tiedosto)
 
     manifest = "<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>"
-    manifest = manifest "\n    <item id=\"stylesheet\" href=\"css/style.css\" media-type=\"text/css\"/>"
+    manifest = manifest "\n    <item id=\"stylesheet\" href=\"css/tyylit.css\" media-type=\"text/css\"/>"
 
     if (kansikuva) {
         system("cp ../" kansikuva " OEBPS/" kansikuva)
@@ -44,6 +49,7 @@ END {
     printf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\"\n\"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n\n<ncx version=\"2005-1\" xml:lang=\"en\" xmlns=\"http://www.daisy.org/z3986/2005/ncx/\">\n\n  <head>\n    <meta name=\"dtb:uid\" content=\"%s\"/> \n    <meta name=\"dtb:depth\" content=\"1\"/> \n    <meta name=\"dtb:totalPageCount\" content=\"0\"/> \n    <meta name=\"dtb:maxPageNumber\" content=\"0\"/> \n  </head>\n\n  <docTitle>\n    <text>%s</text>\n  </docTitle>\n\n  <docAuthor>\n    <text>%s</text>\n  </docAuthor>\n\n  <navMap>\n%s  </navMap>\n\n</ncx>", tunniste, nimeke, kirjoittajat, navpointit) >> tiedosto
     close(tiedosto)
 
-    system("zip -rq ../" tunniste ".epub *")
-    print "Vaihe d) onnistui: epub luotiin."
+    system("zip -rDq0X ../" tunniste ".epub mimetype")
+    system("zip -rqgD0X ../" tunniste ".epub * -x mimetype")
+    print "Vaihe d) onnistui: epub luotiin.\n"
 }

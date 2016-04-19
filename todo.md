@@ -16,4 +16,5 @@
  * ~~python-skriptin korvaaminen awkilla ja kutsulla zip:ille (unzip on jo alussa mukana)~~
  * shell-komennot awk-tiedoston sis\"a\"an system()-kutsuiksi, kaikki tiedostot yhdeksi ohjelmatiedostoksi (getline < tyylit jne.)
  * muuttujien nimien johdonmukaistaminen
+ * lisenssi
  * julkaisu
