@@ -13,16 +13,17 @@ BEGIN {
 }
 NR == 1      { kansio = kansio "/OEBPS/"; tiedosto = kansio "1.xhtml"; tiedoston_alkutekstit(tiedosto)}
 NR == 1      { if (kansikuva) {
+	gsub("^(.)*\/", "", kansikuva )              
+	while( gsub("^[^\/]*\/", "", kansikuva) ) {} 
 	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
-	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
-	gsub("^(.)*\/", "", kannen_nimi )
+	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4) 
 	print "\n" kannen_nimi >> otsikkokansio "otsikot"
 	tiedostonro++
 	close(tiedosto)
 	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
     }
 }
-/body/       { rungossa = "jep!" }
+/body/       { rungossa = "jep!" } 
 rungossa == "" {next}  
 NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
 /[^ ]\r[^ ]/ { if (seuraavana_otsikko == "jep"){ gsub(/\r[^ ]/, " &", $1) } }
