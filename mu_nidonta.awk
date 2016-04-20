@@ -1,8 +1,6 @@
 #!/usr/bin/awk -f
 
-# Ei tyhjii otsikoita mukaan.
-#Ensin mimetype zipiin
-# zip -D0qn -x mimetype
+#KAnsikuvan lisaaminen, jos suhteellisen polun paassa!
 
 BEGIN {
     ORS = ""
@@ -15,11 +13,6 @@ BEGIN {
 
     manifest = "<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>"
     manifest = manifest "\n    <item id=\"stylesheet\" href=\"css/tyylit.css\" media-type=\"text/css\"/>"
-
-    if (kansikuva) {
-        system("cp ../" kansikuva " OEBPS/" kansikuva)
-        manifest = manifest "\n    <item id=\"cover\" href=\"OEBPS/" kansikuva  "\" media-type=\"image/jpeg\"/>"
-    }
 
 }
 
@@ -39,6 +32,14 @@ END {
 	manifest = manifest "\n    <item id=\"file_1\" href=\"1.xhtml\" media-type=\"application/xhtml+xml\" />"
 	spine = spine "\n    <itemref idref=\"file_1\" />"
 	navpointit = navpointit "    <navPoint id=\"file_1\" playOrder=\"1\">\n      <navLabel><text>...</text></navLabel>\n      <content src=\"1.xhtml\" />\n    </navPoint>\n"
+    }
+
+    if (kansikuva) {
+	alk_kansikuva = kansikuva
+	gsub("^(.)*\/", "", kansikuva )
+print "alk_kuva: " alk_kansikuvat "  kuva: " kansikuva "\n" #
+        system("cp ../" alk_kansikuva " OEBPS/" kansikuva)
+        manifest = manifest "\n    <item id=\"cover\" href=\"" kansikuva  "\" media-type=\"image/jpeg\"/>"
     }
     
     tiedosto = "OEBPS/Content.opf"

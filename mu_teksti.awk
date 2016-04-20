@@ -1,10 +1,5 @@
 #!/usr/bin/awk -f
 
-#Tekstin hieronta omaksi funktiokseen!
-#Hieronnan jalkeen tarkistus, onko mitaan kirjoitettavaa. 
-#Tiedostonumeron kasvattaminen vasta tarkastusten jalkeen.
-
-
 BEGIN {
     OFS = ""
     ORS = ""
@@ -176,8 +171,8 @@ function hieronta(kirjoitettava, suljettavat) {
     gsub(/<b>(<b>)+/,"<b>",kirjoitettava)
     gsub(/<\/i>(<\/i>)+/,"</i>",kirjoitettava)
     gsub(/<\/b>(<\/b>)+/,"</b>",kirjoitettava)
-    while (gsub(/<b><\/b>/,"",kirjoitettava) || gsub(/<i><\/i>/,"",kirjoitettava)) {    } # Ongelmia aiemmassa sijainnissa.
-    while (gsub(/<\/i><i>/,"",kirjoitettava) || gsub(/<\/b><b>/,"",kirjoitettava)) { } # Ongelmia aiemmassa sijainnissa.
+    while (gsub(/<b><\/b>/,"",kirjoitettava) || gsub(/<i><\/i>/,"",kirjoitettava)) {    }
+    while (gsub(/<\/i><i>/,"",kirjoitettava) || gsub(/<\/b><b>/,"",kirjoitettava)) { }
     gsub(/>/,">\n",kirjoitettava)
     gsub(/</,"\n<",kirjoitettava)
     gsub(/h1\">\n/,"h1\">",kirjoitettava)

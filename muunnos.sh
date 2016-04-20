@@ -27,13 +27,13 @@
   else
     echo "Tiedosto ${1} ei sisällä metatietoja, muunnetaan käyttäen oletusarvoja."
     cd $kirjoituskansio
-    ./mu_nidonta nimeke="{$tunniste}" kirjoittajat="tuntematon" tunniste="${tunniste}" ../${va_kansio}otsikot
+    ./mu_nidonta nimeke="{$tunniste}" kirjoittajat="tuntematon" tunniste="${tunniste}" nimi="${1}" kansikuva="${3:-""}" ../${va_kansio}otsikot
   fi
 
   cd ..
   
   rm -rf $va_kansio
-  rm -rf $kirjoituskansio
+  #rm -rf $kirjoituskansio
   if [ -f ./${tunniste}.epub ];
   then
       mv ${tunniste}.epub ${2:-Uusi_muste$(date +%j)${$}}.epub
