@@ -1,3 +1,4 @@
+#!/usr/bin/awk -f
 BEGIN {
     komento="../mu_nidonta.awk"
 }

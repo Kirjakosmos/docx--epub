@@ -1,3 +1,4 @@
+#!/bin/sh
   va_kansio=./muuntimen_kansio.${$}$(date +%N)/ 
   kirjoituskansio=./muuntimen_kirjoituskansio.${$}$(date +%N)/ 
   mkdir $va_kansio

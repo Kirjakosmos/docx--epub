@@ -1,3 +1,4 @@
+#!/usr/bin/awk -f
 BEGIN {
     ORS = ""
     tiedosto = "META-INF/container.xml"
