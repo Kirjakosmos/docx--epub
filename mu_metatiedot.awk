@@ -14,11 +14,9 @@ END {
 	komento = komento " kirjoittajat=\"tuntematon\""
     }
     if (kansikuva) {
-	print "kansi: " kansikuva "\n" 
         komento = komento " kansikuva=\"" kansikuva "\""
     }
     komento = komento  " tunniste=\"" tunniste "\" ../" otsikot
     print "Vaihe c) onnistui: metatiedot löytyivät."
-    print komento "\n" 
     system(komento) 
 }
