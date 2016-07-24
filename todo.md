@@ -16,5 +16,6 @@
  * ~~python-skriptin korvaaminen awkilla ja kutsulla zip:ille (unzip on jo alussa mukana)~~ Tehty, ja nyt muutoksen jäljiltä toimiikin taas. :)
  * ~~shell-komennot awk-tiedoston sisään system()-kutsuiksi, kaikki tiedostot yhdeksi ohjelmatiedostoksi (getline < tyylit jne.)~~ Ei liene sittenkään tarkoituksenmukaista. Harkinnassa vielä.
  * muuttujien nimien johdonmukaistaminen
- * lisenssi
+ * ~~lisenssi~~
  * julkaisu
+ * Ennen ensimmäistä otsikkoa esiintyvä leipäteksti sotkee sisällysluetteloa yhdellä askeleella.
