@@ -1,10 +1,10 @@
 #!/usr/bin/awk -f
 
-#    Uuden musteen muunnin. Converts docx-files to epub-files. Written for www.uusimuste.fi
+#    Uuden musteen muunnin. Converts docx-files to epub-files.
 #    Copyright (C) 2016 Matti Palomäki
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#	This program is free software: you can redistribute it and/or modify
+#	    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
@@ -27,6 +27,13 @@ BEGIN {
     close(tiedosto)
     manifest = "<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>"
     manifest = manifest "\n    <item id=\"stylesheet\" href=\"css/tyylit.css\" media-type=\"text/css\"/>"
+}
+/eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti./ { 
+    
+    	luku++
+	manifest = manifest "\n    <item id=\"file_" luku "\" href=\"" luku ".xhtml\" media-type=\"application/xhtml+xml\" />"
+	spine = spine "\n    <itemref idref=\"file_" luku "\" />"
+	$0 = " "
 }
 /[^ \n\r\t]+/    { 
 	luku++

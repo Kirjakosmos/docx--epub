@@ -1,10 +1,10 @@
 #!/usr/bin/awk -f
 
-#    Uuden musteen muunnin. Converts docx-files to epub-files. Written for www.uusimuste.fi
+#    Uuden musteen muunnin. Converts docx-files to epub-files.
 #    Copyright (C) 2016 Matti Palomäki
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#	This program is free software: you can redistribute it and/or modify
+#	    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
@@ -26,12 +26,13 @@ BEGIN {
     virheet = ""  
     kirjoitettava = ""
     seuraavana_otsikko = "jep"
-    raportointi = 5000;
+    raportointi = 5000; 
 }
-NR == 1      { kansio = kansio "/OEBPS/"; tiedosto = kansio "1.xhtml"; tiedoston_alkutekstit(tiedosto)}
-NR == 1      { if (kansikuva) {
-	gsub("^(.)*\/", "", kansikuva )              
-	while( gsub("^[^\/]*\/", "", kansikuva) ) {} 
+NR == 1      { kansio = kansio "/OEBPS/"; tiedosto = kansio "1.xhtml"; tiedoston_alkutekstit(tiedosto) }
+NR == 1      {
+    if (kansikuva) {
+	gsub("^(.)*\/", "", kansikuva)              
+	while( gsub("^[^\/]*\/", "", kansikuva) ) {   } 
 	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
 	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4) 
 	print "\n" kannen_nimi >> otsikkokansio "otsikot"
@@ -43,30 +44,27 @@ NR == 1      { if (kansikuva) {
 /body/       { rungossa = "jep!" } 
 rungossa == "" {next}  
 NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
-/[^ ]\r[^ ]/ { if (seuraavana_otsikko == "jep"){ gsub(/\r[^ ]/, " &", $1) } }
+/[^ ]\r[^ ]/ { if (seuraavana_otsikko) { gsub(/\r[^ ]/, " &", $1) } }
 /\r/         { gsub(/\r/, "<br />", $1) }
 /PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
 /TOC \\/  {$1 = ""}
 /w:instrText/ { $1 = "" }
 /wp:align$/ { $1 = "" }
-/¤¤¤o¤¤¤/   { seuraavana_otsikko = "jep"
+/¤¤¤o¤¤¤/   {
+    seuraavana_otsikko = "jep"
     gsub(/¤¤¤o¤¤¤/, "", $0)
-    if (eka=="mennyt"){
-	gsub(/<p>$/,"",kirjoitettava)
-	if (kirjoitettava) {
-	    kirjoitettava = hieronta(kirjoitettava, suljettavat)
-	    if (kirjoitettava ~ "[^ \t\n\r]+") {
-		luku_loppuu(tiedosto, suljettavat,kirjoitettava)
-		tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-		tiedostonro++;
-	    }
-	}
-	suljettavat=""; kirjoitettava=""
-    } else {eka = "mennyt"}
+    kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
+    kirjoitettava = hieronta(kirjoitettava, suljettavat)
+    if (kirjoitettava ~ "[^ \t\n\r]+") {
+	luku_loppuu(tiedosto, suljettavat, kirjoitettava)
+	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+	tiedostonro++;
+        suljettavat=""; kirjoitettava=""
+    }
     kirjoitettava = kirjoitettava "<p>"
 }
 NF>1         { 
-    if (seuraavana_otsikko == "jep") {
+    if (seuraavana_otsikko) {
         if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "
 	}
         otsikko = otsikko "" $1 
@@ -77,16 +75,14 @@ NF>1         {
 /:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
      kirjoitettava = kirjoitettava "</p>"
      seuraavana_otsikko = "jep"
-     if (eka=="mennyt"){
-	 kirjoitettava = hieronta(kirjoitettava, suljettavat)
-	 if (kirjoitettava ~ "[^ \n\r\t]+") {
-	     tiedostonro++;
-	     luku_loppuu(tiedosto, suljettavat,kirjoitettava)
-	     suljettavat=""
-	     kirjoitettava=""
-	     tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-	 }
-     } else {eka = "mennyt"}
+     kirjoitettava = hieronta(kirjoitettava, suljettavat)
+     if (kirjoitettava ~ "[^ \n\r\t]+") {
+	 tiedostonro++;
+	 luku_loppuu(tiedosto, suljettavat, kirjoitettava)
+	 suljettavat=""
+	 kirjoitettava=""
+	 tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+     }
      kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
 /:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
@@ -109,16 +105,17 @@ NF>1         {
 /w:numId w:val=/  {
     lista++
     kirjoitettava = kirjoitettava " " lista ". "
-    if (seuraavana_otsikko == "jep") { otsikko = otsikko " " lista ". "}
+    if (seuraavana_otsikko) { otsikko = otsikko " " lista ". "}
     }
 /^w:p$/ || /^w:p w/   {kirjoitettava = kirjoitettava "<p>"}
-/\/w:p$/      {kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
-    if (seuraavana_otsikko == "jep"){
-        gsub("(\n)+"," ",otsikko)
+/\/w:p$/      {
+    kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
+    if (seuraavana_otsikko) {
+        gsub("(\n)+", " ", otsikko)
         otsikko = "\n" otsikko
+	if (otsikko ~ /^[ \n\r\t]+$/) {otsikko = otsikko "eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti."} 
         print otsikko "" >> otsikkokansio "otsikot"
         otsikko = seuraavana_otsikko = ""
-	eka = "mennyt"
     }
 }
 /w:b\//       {kirjoitettava = kirjoitettava "<b>"
@@ -130,13 +127,12 @@ NF>1         {
 /\/w:t/       {kirjoitettava = kirjoitettava suljettavat; suljettavat = ""}
 END {
     if (rungossa=="") {virheet = virheet  "Asiakirjalla ei ollut \"<body> ... </body>\"-rakennetta.\n"}
-    if (eka=="") {virheet = virheet  "Huom! Asiakirjasta ei löytynyt lainkaan otsikoita.\n"}
     kirjoitettava = hieronta(kirjoitettava, suljettavat)
     luku_loppuu(tiedosto, suljettavat, kirjoitettava)
-    if (virheet == ""){
-        print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
-    } else {
+    if (virheet) {
         print "\nTiedoston tekstin lukemisessa kohdattiin seuraavat virheet:\n" virheet
+    } else {
+        print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
     }
 }
  
@@ -150,39 +146,39 @@ function tiedoston_alkutekstit(tiedosto) {
 }
 function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
-    gsub(/\n/,"",kirjoitettava)
-    gsub(/>[ \s]+</,"><",kirjoitettava)
-    gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/,"<p>\n<br />\n",kirjoitettava)  
-    gsub(/<i>(<i>)+/,"<i>",kirjoitettava)
-    gsub(/<b>(<b>)+/,"<b>",kirjoitettava)
-    gsub(/<\/i>(<\/i>)+/,"</i>",kirjoitettava)
-    gsub(/<\/b>(<\/b>)+/,"</b>",kirjoitettava)
-    while (gsub(/<b><\/b>/,"",kirjoitettava) || gsub(/<i><\/i>/,"",kirjoitettava)) {    }
-    while (gsub(/<\/i><i>/,"",kirjoitettava) || gsub(/<\/b><b>/,"",kirjoitettava)) { }
-    gsub(/>/,">\n",kirjoitettava)
-    gsub(/</,"\n<",kirjoitettava)
-    gsub(/h1\">\n/,"h1\">",kirjoitettava)
-    gsub(/\n<b>\n/,"<b>",kirjoitettava)
-    gsub(/\n<i>\n/,"<i>",kirjoitettava)
-    gsub(/\n<\/b>\n/,"</b>",kirjoitettava)
-    gsub(/\n<\/i>\n/,"</i>",kirjoitettava)
-    gsub(/p></,"p>\n<",kirjoitettava)
-    gsub(/><\/p/,">\n</p",kirjoitettava)
-    while (gsub(/<p>[\n]*<\/p>/,"",kirjoitettava)) { }
-    gsub(/>[\n]+</,">\n<",kirjoitettava)
-    gsub(/<p[^h>]*>/,"&\r",kirjoitettava)
-    gsub(/class=\"h[1-9]?\"[^\r]+<p/,"& class=\"eka\"",kirjoitettava)
-    gsub(/class=\"eka\"[^<>\"]+class=\"/," class=\"eka",kirjoitettava)
-    gsub(/\r/,"",kirjoitettava)
-    gsub(/\n[\n]{1,}/,"\n",kirjoitettava)
+    gsub(/\n/, "", kirjoitettava)
+    gsub(/>[ \s]+</, "><", kirjoitettava)
+    gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
+    gsub(/<i>(<i>)+/, "<i>", kirjoitettava)
+    gsub(/<b>(<b>)+/, "<b>", kirjoitettava)
+    gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava)
+    gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava)
+    while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   }
+    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   }
+    gsub(/>/, ">\n", kirjoitettava)
+    gsub(/</, "\n<", kirjoitettava)
+    gsub(/h1\">\n/, "h1\">", kirjoitettava)
+    gsub(/\n<b>\n/, "<b>", kirjoitettava)
+    gsub(/\n<i>\n/, "<i>", kirjoitettava)
+    gsub(/\n<\/b>\n/, "</b>", kirjoitettava)
+    gsub(/\n<\/i>\n/, "</i>", kirjoitettava)
+    gsub(/p></, "p>\n<", kirjoitettava)
+    gsub(/><\/p/, ">\n</p", kirjoitettava)
+    while (gsub(/<p>[\n]*<\/p>/, "", kirjoitettava)) {   }
+    gsub(/>[\n]+</, ">\n<", kirjoitettava)
+    gsub(/<p[^h>]*>/, "&\r", kirjoitettava)
+    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava)
+    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava)
+    gsub(/\r/, "", kirjoitettava)
+    gsub(/\n[\n]{1, }/, "\n", kirjoitettava)
     return kirjoitettava
 }
-function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
+function luku_loppuu(tiedosto, suljettavat, kirjoitettava) {
     
     print kirjoitettava "</body>\n</html>" >> tiedosto
     close(tiedosto)
 }
-function seuraava_luku_alkaa(tiedosto, tiedostonro, kansio){
+function seuraava_luku_alkaa(tiedosto, tiedostonro, kansio) {
     tiedosto = kansio tiedostonro ".xhtml"
     tiedoston_alkutekstit(tiedosto)
     return tiedosto

@@ -18,4 +18,5 @@
  * muuttujien nimien johdonmukaistaminen
  * ~~lisenssi~~
  * julkaisu
- * Ennen ensimmäistä otsikkoa esiintyvä leipäteksti sotkee sisällysluetteloa yhdellä askeleella.
+ * ~~Ennen ensimmäistä otsikkoa esiintyvä leipäteksti sotkee sisällysluetteloa yhdellä askeleella.~~
+ * mahdollisuus lisätä sisäkkäisiä linkkejä sisällysluetteloon avainsanoilla
