@@ -27,9 +27,13 @@ BEGIN {
     virheet = ""  
     kirjoitettava = ""
     seuraavana_otsikko = "jep"
-    raportointi = 5000; 
+    raportointi = 5000 
 }
-NR == 1      { kansio = kansio "/OEBPS/"; tiedosto = kansio "1.xhtml"; tiedoston_alkutekstit(tiedosto) }
+NR == 1      {
+    kansio = kansio "/OEBPS/"
+    tiedosto = kansio "1.xhtml"
+    tiedoston_alkutekstit(tiedosto)
+}
 NR == 1      {
     if (kansikuva) {
 	gsub("^(.)*\/", "", kansikuva)              
@@ -44,23 +48,30 @@ NR == 1      {
 }
 /body/       { rungossa = "jep!" } 
 rungossa == "" {next}  
-NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
+NR == raportointi {
+    print "\nKäsitelty " NR " riviä."
+    raportointi += 5000
+}
 /[^ ]\r[^ ]/ { if (seuraavana_otsikko) { gsub(/\r[^ ]/, " &", $1) } }
 /\r/         { gsub(/\r/, "<br />", $1) }
-/PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
+/PAGEREF/  {
+    $1 = ""
+    kirjoitettava = kirjoitettava "      "
+}
 /TOC \\/  {$1 = ""}
 /w:instrText/ { $1 = "" }
 /wp:align$/ { $1 = "" }
 /¤¤¤o¤¤¤/   {
     seuraavana_otsikko = "jep"
     gsub(/¤¤¤o¤¤¤/, "", $0)
-    kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
+    kirjoitettava = kirjoitettava suljettavat "</p>"
+    suljettavat = ""
     kirjoitettava = hieronta(kirjoitettava, suljettavat)
     if (kirjoitettava ~ "[^ \t\n\r]+") {
 	luku_loppuu(tiedosto, suljettavat, kirjoitettava)
 	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-	tiedostonro++;
-        suljettavat=""; kirjoitettava=""
+	tiedostonro++
+        suljettavat = kirjoitettava = ""
     }
     kirjoitettava = kirjoitettava "<p>"
 }
@@ -70,15 +81,19 @@ NF>1         {
 	}
         otsikko = otsikko "" $1 
     } 
-    kirjoitettava = kirjoitettava  $1 "\n"; $0 = $2;
+    kirjoitettava = kirjoitettava  $1 "\n"
+    $0 = $2
 }
-/^w:p[ ](.)*\/$/  {kirjoitettava = kirjoitettava "<p><br /></p>"; next}
+/^w:p[ ](.)*\/$/  {
+    kirjoitettava = kirjoitettava "<p><br /></p>"
+    next
+}
 /:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
      kirjoitettava = kirjoitettava "</p>"
      seuraavana_otsikko = "jep"
      kirjoitettava = hieronta(kirjoitettava, suljettavat)
      if (kirjoitettava ~ "[^ \n\r\t]+") {
-	 tiedostonro++;
+	 tiedostonro++
 	 luku_loppuu(tiedosto, suljettavat, kirjoitettava)
 	 suljettavat=""
 	 kirjoitettava=""
@@ -110,7 +125,8 @@ NF>1         {
     }
 /^w:p$/ || /^w:p w/   {kirjoitettava = kirjoitettava "<p>"}
 /\/w:p$/      {
-    kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
+    kirjoitettava = kirjoitettava suljettavat "</p>"
+    suljettavat = ""
     if (seuraavana_otsikko) {
         gsub("(\n)+", " ", otsikko)
         otsikko = "\n" otsikko
@@ -119,13 +135,18 @@ NF>1         {
         otsikko = seuraavana_otsikko = ""
     }
 }
-/w:b\//       {kirjoitettava = kirjoitettava "<b>"
-               suljettavat = "</b>" suljettavat}
-/w:i\//       {kirjoitettava = kirjoitettava "<i>"
+/w:b\//       {
+    kirjoitettava = kirjoitettava "<b>"
+    suljettavat = "</b>" suljettavat}
+/w:i\//       {
+    kirjoitettava = kirjoitettava "<i>"
     suljettavat = "</i>" suljettavat}
-/w:u(.)*\//       {kirjoitettava = kirjoitettava "<u>"
+/w:u(.)*\//       {
+    kirjoitettava = kirjoitettava "<u>"
     suljettavat = "</u>" suljettavat}
-/\/w:t/       {kirjoitettava = kirjoitettava suljettavat; suljettavat = ""}
+/\/w:t/       {
+    kirjoitettava = kirjoitettava suljettavat
+    suljettavat = ""}
 END {
     if (rungossa=="") {virheet = virheet  "Asiakirjalla ei ollut \"<body> ... </body>\"-rakennetta.\n"}
     kirjoitettava = hieronta(kirjoitettava, suljettavat)
@@ -148,7 +169,6 @@ function tiedoston_alkutekstit(tiedosto) {
 function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
     gsub(/\n/, "", kirjoitettava)
-    gsub(/>[ \s]+</, "><", kirjoitettava)
     gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
     gsub(/<i>(<i>)+/, "<i>", kirjoitettava)
     gsub(/<b>(<b>)+/, "<b>", kirjoitettava)
