@@ -2,7 +2,7 @@
 
 #    Uuden musteen muunnin. Converts docx-files to epub-files.
 #    Copyright (C) 2016 Matti Palomäki. 
-Written for www.uusimuste.fi
+#    Written for www.uusimuste.fi
 #
 #	This program is free software: you can redistribute it and/or modify
 #	    it under the terms of the GNU General Public License as published by
