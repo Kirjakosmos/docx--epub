@@ -29,9 +29,9 @@ BEGIN {
     manifest = "<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\"/>"
     manifest = manifest "\n    <item id=\"stylesheet\" href=\"css/tyylit.css\" media-type=\"text/css\"/>"
 }
-/eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti./ { 
-    
+/eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti./ {
     	luku++
+    	piilolukuja++
 	manifest = manifest "\n    <item id=\"file_" luku "\" href=\"" luku ".xhtml\" media-type=\"application/xhtml+xml\" />"
 	spine = spine "\n    <itemref idref=\"file_" luku "\" />"
 	$0 = " "
@@ -40,7 +40,7 @@ BEGIN {
 	luku++
 	manifest = manifest "\n    <item id=\"file_" luku "\" href=\"" luku ".xhtml\" media-type=\"application/xhtml+xml\" />"
 	spine = spine "\n    <itemref idref=\"file_" luku "\" />"
-	navpointit = navpointit "    <navPoint id=\"file_" luku "\" playOrder=\"" luku "\">\n      <navLabel><text>" $0 "</text></navLabel>\n      <content src=\"" luku ".xhtml\" />\n    </navPoint>\n"
+	navpointit = navpointit "    <navPoint id=\"file_" luku "\" playOrder=\"" (luku - piilolukuja) "\">\n      <navLabel><text>" $0 "</text></navLabel>\n      <content src=\"" luku ".xhtml\" />\n    </navPoint>\n"
     }
 END {
     if (luku == 0) 
