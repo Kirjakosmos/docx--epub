@@ -1,8 +1,7 @@
 #!/usr/bin/awk -f
 
-#    Uuden musteen muunnin. Converts docx-files to epub-files.
-#    Copyright (C) 2016 Matti Palomäki. 
-#    Written for www.uusimuste.fi
+#    Uuden musteen muunnin. Converts docx-files to epub-files. Written for www.uusimuste.fi
+#    Copyright (C) 2016 Matti Palomäki
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,17 +26,12 @@ BEGIN {
     virheet = ""  
     kirjoitettava = ""
     seuraavana_otsikko = "jep"
-    raportointi = 5000 
+    raportointi = 5000;
 }
-NR == 1      {
-    kansio = kansio "/OEBPS/"
-    tiedosto = kansio "1.xhtml"
-    tiedoston_alkutekstit(tiedosto)
-}
-NR == 1      {
-    if (kansikuva) {
-	gsub("^(.)*\/", "", kansikuva)              
-	while( gsub("^[^\/]*\/", "", kansikuva) ) {   } 
+NR == 1      { kansio = kansio "/OEBPS/"; tiedosto = kansio "1.xhtml"; tiedoston_alkutekstit(tiedosto)}
+NR == 1      { if (kansikuva) {
+	gsub("^(.)*\/", "", kansikuva )              
+	while( gsub("^[^\/]*\/", "", kansikuva) ) {} 
 	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
 	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4) 
 	print "\n" kannen_nimi >> otsikkokansio "otsikot"
@@ -48,57 +42,51 @@ NR == 1      {
 }
 /body/       { rungossa = "jep!" } 
 rungossa == "" {next}  
-NR == raportointi {
-    print "\nKäsitelty " NR " riviä."
-    raportointi += 5000
-}
-/[^ ]\r[^ ]/ { if (seuraavana_otsikko) { gsub(/\r[^ ]/, " &", $1) } }
+NR == raportointi {print "\nKäsitelty " NR " riviä."; raportointi += 5000}
+/[^ ]\r[^ ]/ { if (seuraavana_otsikko == "jep"){ gsub(/\r[^ ]/, " &", $1) } }
 /\r/         { gsub(/\r/, "<br />", $1) }
-/PAGEREF/  {
-    $1 = ""
-    kirjoitettava = kirjoitettava "      "
-}
+/PAGEREF/  {$1 = ""; kirjoitettava = kirjoitettava "      "}
 /TOC \\/  {$1 = ""}
 /w:instrText/ { $1 = "" }
 /wp:align$/ { $1 = "" }
-/¤¤¤o¤¤¤/   {
-    seuraavana_otsikko = "jep"
+/¤¤¤o¤¤¤/   { seuraavana_otsikko = "jep"
     gsub(/¤¤¤o¤¤¤/, "", $0)
-    kirjoitettava = kirjoitettava suljettavat "</p>"
-    suljettavat = ""
-    kirjoitettava = hieronta(kirjoitettava, suljettavat)
-    if (kirjoitettava ~ "[^ \t\n\r]+") {
-	luku_loppuu(tiedosto, suljettavat, kirjoitettava)
-	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-	tiedostonro++
-        suljettavat = kirjoitettava = ""
-    }
+    if (eka=="mennyt"){
+	gsub(/<p>$/,"",kirjoitettava)
+	if (kirjoitettava) {
+	    kirjoitettava = hieronta(kirjoitettava, suljettavat)
+	    if (kirjoitettava ~ "[^ \t\n\r]+") {
+		luku_loppuu(tiedosto, suljettavat,kirjoitettava)
+		tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+		tiedostonro++;
+	    }
+	}
+	suljettavat=""; kirjoitettava=""
+    } else {eka = "mennyt"}
     kirjoitettava = kirjoitettava "<p>"
 }
 NF>1         { 
-    if (seuraavana_otsikko) {
+    if (seuraavana_otsikko == "jep") {
         if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "
 	}
         otsikko = otsikko "" $1 
     } 
-    kirjoitettava = kirjoitettava  $1 "\n"
-    $0 = $2
+    kirjoitettava = kirjoitettava  $1 "\n"; $0 = $2;
 }
-/^w:p[ ](.)*\/$/  {
-    kirjoitettava = kirjoitettava "<p><br /></p>"
-    next
-}
+/^w:p[ ](.)*\/$/  {kirjoitettava = kirjoitettava "<p><br /></p>"; next}
 /:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
      kirjoitettava = kirjoitettava "</p>"
      seuraavana_otsikko = "jep"
-     kirjoitettava = hieronta(kirjoitettava, suljettavat)
-     if (kirjoitettava ~ "[^ \n\r\t]+") {
-	 tiedostonro++
-	 luku_loppuu(tiedosto, suljettavat, kirjoitettava)
-	 suljettavat=""
-	 kirjoitettava=""
-	 tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-     }
+     if (eka=="mennyt"){
+	 kirjoitettava = hieronta(kirjoitettava, suljettavat)
+	 if (kirjoitettava ~ "[^ \n\r\t]+") {
+	     tiedostonro++;
+	     luku_loppuu(tiedosto, suljettavat,kirjoitettava)
+	     suljettavat=""
+	     kirjoitettava=""
+	     tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+	 }
+     } else {eka = "mennyt"}
      kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
 /:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
@@ -119,42 +107,89 @@ NF>1         {
      kirjoitettava = kirjoitettava "</p><p class=\"tyyli5\">" }
 /w:br\// {kirjoitettava = kirjoitettava "<br />"}
 /w:numId w:val=/  {
-    lista++
-    kirjoitettava = kirjoitettava " " lista ". "
-    if (seuraavana_otsikko) { otsikko = otsikko " " lista ". "}
+    if (!(numeroinnit)) 
+    {
+	numeroinnit = otsikkokansio "word/numbering.xml"
+	while (getline rivi < numeroinnit)
+	{
+	    if (rivi ~ /w:abstractNum w/) 
+	    {
+		match(rivi, "=\"(.)+\"")
+		numId = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 ) + 0
+	    }
+	    if (rivi ~ /w:lvl w:ilvl/) 
+	    {
+		match(rivi, "=\"(.)+\"")
+		listataso = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 ) + 0
+	    }
+	    if (rivi ~ /w:start w:val=/ && listaformaatti != "bullet") 
+	    {
+		match(rivi, "=\"(.)+\"")
+		merkki = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 )
+		listamerkit[numId " " listataso] = merkki
+	    }
+	    if (rivi ~ /w:numFmt/) 
+	    {
+		match(rivi, "=\"(.)+\"")
+		listaformaatti = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 )
+	    }
+	    if (rivi ~ /w:lvlText/ && listaformaatti == "bullet") 
+	    {
+		match(rivi, "=\"(.)+\"")
+		merkki = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 )
+		listamerkit[numId " " listataso] = merkki
+	    }
+	}
+	close(numeroinnit)
+	print " \n  Alavaihe bb) suoritettu: asiakirjan numerointi luettu."
     }
+    
+}
+/w:ilvl w:val=/  { 
+    match($0, "=\"(.)+\"")
+    ilvl = substr( $0, RSTART +2 +length(muuttuja), RLENGTH -3 )
+}
+/w:numId w:val=/  { 
+   match($0, "=\"(.)+\"")
+   numId = substr( $0, RSTART +2 +length(muuttuja), RLENGTH -3 )
+}
+/w:numId w:val=/  { 
+    kirjoitettava = kirjoitettava " " listamerkit[numId " " ilvl]
+    if (listamerkit[numId " " ilvl]+0 != 0 || listamerkit[numId " " ilvl] == "0") 
+    {
+	if (seuraavana_otsikko == "jep") { otsikko = otsikko " " listamerkit[numId " " ilvl] ". "}
+	kirjoitettava = kirjoitettava "."
+	++listamerkit[numId " " ilvl]
+    }
+    kirjoitettava = kirjoitettava " "
+}
 /^w:p$/ || /^w:p w/   {kirjoitettava = kirjoitettava "<p>"}
-/\/w:p$/      {
-    kirjoitettava = kirjoitettava suljettavat "</p>"
-    suljettavat = ""
-    if (seuraavana_otsikko) {
-        gsub("(\n)+", " ", otsikko)
+/\/w:p$/      {kirjoitettava = kirjoitettava suljettavat "</p>"; suljettavat = ""
+    if (seuraavana_otsikko == "jep")
+    {
+        gsub("(\n)+"," ",otsikko)
         otsikko = "\n" otsikko
-	if (otsikko ~ /^[ \n\r\t]+$/) {otsikko = otsikko "eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti."} 
         print otsikko "" >> otsikkokansio "otsikot"
         otsikko = seuraavana_otsikko = ""
+	eka = "mennyt"
     }
 }
-/w:b\//       {
-    kirjoitettava = kirjoitettava "<b>"
-    suljettavat = "</b>" suljettavat}
-/w:i\//       {
-    kirjoitettava = kirjoitettava "<i>"
+/w:b\//       {kirjoitettava = kirjoitettava "<b>"
+               suljettavat = "</b>" suljettavat}
+/w:i\//       {kirjoitettava = kirjoitettava "<i>"
     suljettavat = "</i>" suljettavat}
-/w:u(.)*\//       {
-    kirjoitettava = kirjoitettava "<u>"
+/w:u(.)*\//       {kirjoitettava = kirjoitettava "<u>"
     suljettavat = "</u>" suljettavat}
-/\/w:t/       {
-    kirjoitettava = kirjoitettava suljettavat
-    suljettavat = ""}
+/\/w:t/       {kirjoitettava = kirjoitettava suljettavat; suljettavat = ""}
 END {
     if (rungossa=="") {virheet = virheet  "Asiakirjalla ei ollut \"<body> ... </body>\"-rakennetta.\n"}
+    if (eka=="") {virheet = virheet  "Huom! Asiakirjasta ei löytynyt lainkaan otsikoita.\n"}
     kirjoitettava = hieronta(kirjoitettava, suljettavat)
     luku_loppuu(tiedosto, suljettavat, kirjoitettava)
-    if (virheet) {
-        print "\nTiedoston tekstin lukemisessa kohdattiin seuraavat virheet:\n" virheet
-    } else {
+    if (virheet == ""){
         print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
+    } else {
+        print "\nTiedoston tekstin lukemisessa kohdattiin seuraavat virheet:\n" virheet
     }
 }
  
@@ -168,38 +203,39 @@ function tiedoston_alkutekstit(tiedosto) {
 }
 function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
-    gsub(/\n/, "", kirjoitettava)
-    gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
-    gsub(/<i>(<i>)+/, "<i>", kirjoitettava)
-    gsub(/<b>(<b>)+/, "<b>", kirjoitettava)
-    gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava)
-    gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava)
-    while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   }
-    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   }
-    gsub(/>/, ">\n", kirjoitettava)
-    gsub(/</, "\n<", kirjoitettava)
-    gsub(/h1\">\n/, "h1\">", kirjoitettava)
-    gsub(/\n<b>\n/, "<b>", kirjoitettava)
-    gsub(/\n<i>\n/, "<i>", kirjoitettava)
-    gsub(/\n<\/b>\n/, "</b>", kirjoitettava)
-    gsub(/\n<\/i>\n/, "</i>", kirjoitettava)
-    gsub(/p></, "p>\n<", kirjoitettava)
-    gsub(/><\/p/, ">\n</p", kirjoitettava)
-    while (gsub(/<p>[\n]*<\/p>/, "", kirjoitettava)) {   }
-    gsub(/>[\n]+</, ">\n<", kirjoitettava)
-    gsub(/<p[^h>]*>/, "&\r", kirjoitettava)
-    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava)
-    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava)
-    gsub(/\r/, "", kirjoitettava)
-    gsub(/\n[\n]{1, }/, "\n", kirjoitettava)
+    gsub(/\n/,"",kirjoitettava)
+    gsub(/>[ \s]+</,"><",kirjoitettava)
+    gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/,"<p>\n<br />\n",kirjoitettava)  
+    gsub(/<i>(<i>)+/,"<i>",kirjoitettava)
+    gsub(/<b>(<b>)+/,"<b>",kirjoitettava)
+    gsub(/<\/i>(<\/i>)+/,"</i>",kirjoitettava)
+    gsub(/<\/b>(<\/b>)+/,"</b>",kirjoitettava)
+    while (gsub(/<b><\/b>/,"",kirjoitettava) || gsub(/<i><\/i>/,"",kirjoitettava)) {    }
+    while (gsub(/<\/i><i>/,"",kirjoitettava) || gsub(/<\/b><b>/,"",kirjoitettava)) { }
+    gsub(/>/,">\n",kirjoitettava)
+    gsub(/</,"\n<",kirjoitettava)
+    gsub(/h1\">\n/,"h1\">",kirjoitettava)
+    gsub(/\n<b>\n/,"<b>",kirjoitettava)
+    gsub(/\n<i>\n/,"<i>",kirjoitettava)
+    gsub(/\n<\/b>\n/,"</b>",kirjoitettava)
+    gsub(/\n<\/i>\n/,"</i>",kirjoitettava)
+    gsub(/p></,"p>\n<",kirjoitettava)
+    gsub(/><\/p/,">\n</p",kirjoitettava)
+    while (gsub(/<p>[\n]*<\/p>/,"",kirjoitettava)) { }
+    gsub(/>[\n]+</,">\n<",kirjoitettava)
+    gsub(/<p[^h>]*>/,"&\r",kirjoitettava)
+    gsub(/class=\"h[1-9]?\"[^\r]+<p/,"& class=\"eka\"",kirjoitettava)
+    gsub(/class=\"eka\"[^<>\"]+class=\"/," class=\"eka",kirjoitettava)
+    gsub(/\r/,"",kirjoitettava)
+    gsub(/\n[\n]{1,}/,"\n",kirjoitettava)
     return kirjoitettava
 }
-function luku_loppuu(tiedosto, suljettavat, kirjoitettava) {
+function luku_loppuu(tiedosto, suljettavat, kirjoitettava){
     
     print kirjoitettava "</body>\n</html>" >> tiedosto
     close(tiedosto)
 }
-function seuraava_luku_alkaa(tiedosto, tiedostonro, kansio) {
+function seuraava_luku_alkaa(tiedosto, tiedostonro, kansio){
     tiedosto = kansio tiedostonro ".xhtml"
     tiedoston_alkutekstit(tiedosto)
     return tiedosto

@@ -1,8 +1,7 @@
 #!/usr/bin/awk -f
 
-#    Uuden musteen muunnin. Converts docx-files to epub-files.
-#    Copyright (C) 2016 Matti Palomäki. 
-#    Written for www.uusimuste.fi
+#    Uuden musteen muunnin. Converts docx-files to epub-files. Written for www.uusimuste.fi
+#    Copyright (C) 2016 Matti Palomäki
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -20,21 +19,15 @@
 BEGIN {
     komento="../mu_nidonta.awk"
 }
-/title>[^<]+<\//  {
-    match($0, /title>[^<]+<\//)
-    komento = komento " nimeke=\"" substr($0, RSTART+6, RLENGTH-8) "\""
-}
-/creator>[^<]+<\//  {
-    match($0, /creator>[^<]+<\//)
-    komento = komento " kirjoittajat=\"" substr($0, RSTART+8, RLENGTH-10) "\""
-}
+/title>[^<]+<\//  {match($0, /title>[^<]+<\//); komento = komento " nimeke=\"" substr($0,RSTART+6,RLENGTH-8) "\""}
+/creator>[^<]+<\//  {match($0, /creator>[^<]+<\//); komento = komento " kirjoittajat=\"" substr($0,RSTART+8,RLENGTH-10) "\""}
 END {
-    if (!index(komento, "nimeke=")) {
-        gsub(/\.doc[x]?/, "", nimi)
-        gsub(/^(.)*\//, "", nimi)
+    if (!index(komento,"nimeke=")){
+        gsub(/\.doc[x]?/,"",nimi)
+        gsub(/^(.)*\//,"",nimi)
         komento = komento " nimeke=\"" nimi "\""
     }
-    if (!index(komento, "kirjoittajat=")){
+    if (!index(komento,"kirjoittajat=")){
 	komento = komento " kirjoittajat=\"tuntematon\""
     }
     if (kansikuva) {
