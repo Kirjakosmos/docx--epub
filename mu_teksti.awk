@@ -79,7 +79,7 @@ NR == raportointi {
     }
     kirjoitettava = kirjoitettava "<p>"
 }
-NF>1         { 
+NF > 1       { 
     if (seuraavana_otsikko) {
         if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "
 	}
@@ -131,43 +131,42 @@ NF>1         {
 	    if (rivi ~ /w:abstractNum w/) 
 	    {
 		match(rivi, "=\"(.)+\"")
-		numId = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 ) + 0
+		numId = substr( rivi, RSTART +2, RLENGTH -3 ) + 0
 	    }
 	    if (rivi ~ /w:lvl w:ilvl/) 
 	    {
 		match(rivi, "=\"(.)+\"")
-		listataso = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 ) + 0
+		listataso = substr( rivi, RSTART +2, RLENGTH -3 ) + 0
 	    }
 	    if (rivi ~ /w:start w:val=/ && listaformaatti != "bullet") 
 	    {
 		match(rivi, "=\"(.)+\"")
-		merkki = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 )
+		merkki = substr( rivi, RSTART +2, RLENGTH -3 )
 		listamerkit[numId " " listataso] = merkki
 	    }
 	    if (rivi ~ /w:numFmt/) 
 	    {
 		match(rivi, "=\"(.)+\"")
-		listaformaatti = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 )
+		listaformaatti = substr( rivi, RSTART +2, RLENGTH -3 )
 	    }
 	    if (rivi ~ /w:lvlText/ && listaformaatti == "bullet") 
 	    {
 		match(rivi, "=\"(.)+\"")
-		merkki = substr( rivi, RSTART +2 +length(muuttuja), RLENGTH -3 )
+		merkki = substr( rivi, RSTART +2, RLENGTH -3 )
 		listamerkit[numId " " listataso] = merkki
 	    }
 	}
 	close(numeroinnit)
 	print " \n  Alavaihe bb) suoritettu: asiakirjan numerointi luettu."
-    }
-    
+    }   
 }
 /w:ilvl w:val=/  { 
     match($0, "=\"(.)+\"")
-    ilvl = substr( $0, RSTART +2 +length(muuttuja), RLENGTH -3 )
+    ilvl = substr( $0, RSTART +2, RLENGTH -3 )
 }
 /w:numId w:val=/  { 
    match($0, "=\"(.)+\"")
-   numId = substr( $0, RSTART +2 +length(muuttuja), RLENGTH -3 )
+   numId = substr( $0, RSTART +2, RLENGTH -3 )
 }
 /w:numId w:val=/  { 
     kirjoitettava = kirjoitettava " " listamerkit[numId " " ilvl]
