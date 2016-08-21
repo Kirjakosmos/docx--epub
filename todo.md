@@ -10,6 +10,8 @@
  * muuttujien nimien johdonmukaistaminen
  * julkaisu
  * mahdollisuus lisätä sisäkkäisiä linkkejä sisällysluetteloon avainsanoilla
- * EDELLISEN COMMITIN ylikirjoittamien juttujen onkiminen ja pelastaminen: 
-  * siistimiset, eli tyyli johdonmukaiseksi (ml. if (kirjoitettava) -tyyppiset ehdot)
-  * tyhjien otsikoiden mahdollistaminen
+ * ~~EDELLISEN COMMITIN ylikirjoittamien juttujen onkiminen ja pelastaminen: ~~
+  * ~~siistimiset, eli tyyli johdonmukaiseksi (ml. if (kirjoitettava) -tyyppiset ehdot)~~
+  * ~~tyhjien otsikoiden mahdollistaminen~~
+ * MAHDOLLINEN BUGI "ekojen versioiden" käsittelyssä: vain ekan tyylin versioon 0em tulee oikein?
+ * Pitää olla mahdollista päättää tyylien ensimmäisen kappaleen sisennyksestä jotenkin! (Väh. jos sisennystä/marginaalia -> ei ekan rivin sisennyksiä)
