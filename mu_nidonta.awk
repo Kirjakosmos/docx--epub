@@ -56,6 +56,20 @@ END {
         manifest = manifest "\n    <item id=\"cover\" href=\"" kansikuva  "\" media-type=\"image/jpeg\"/>"
     }
     
+    ++luku;
+    manifest = manifest "\n    <item id=\"file_" luku "\" href=\"" luku ".xhtml\" media-type=\"application/xhtml+xml\" />"
+    spine = spine "\n    <itemref idref=\"file_" luku "\" />"
+    tiedosto = luku ".xhtml"
+    print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"" > tiedosto
+    print "\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" >> tiedosto
+    print  "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n" >> tiedosto
+    print "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n<title>" tiedostonro  >> tiedosto
+    print "</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tyylit.css\" />\n</head>" >> tiedosto
+    print "\n<body>" >> tiedosto
+    print "<p>Lukemasi epub luotiin Uuden musteen muuntimella:</p>\n<p>www.uusimuste.fi - lukeville ja kirjoittaville ihmisille.</p>">> tiedosto
+    print kirjoitettava "</body>\n</html>" >> tiedosto
+    close(tiedosto)
+    
     tiedosto = "OEBPS/Content.opf"
     printf("<package version=\"2.0\" xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"tunniste\">\n  <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n    <dc:title>%s</dc:title>\n    <dc:language>%s</dc:language>\n    <dc:creator>%s</dc:creator>\n    <dc:identifier id=\"tunniste\">%s</dc:identifier>\n    <meta name=\"cover\" content=\"cover-image\" />\n  </metadata>\n  <manifest>\n    %s\n  </manifest>\n  <spine xmlns=\"http://www.idpf.org/2007/opf\" toc=\"ncx\">\n    %s\n  </spine>\n</package>", nimeke, "fi", kirjoittajat, tunniste, manifest, spine) >> tiedosto
     close(tiedosto)
