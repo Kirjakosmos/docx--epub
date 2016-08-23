@@ -59,7 +59,7 @@ END {
     ++luku;
     manifest = manifest "\n    <item id=\"file_" luku "\" href=\"" luku ".xhtml\" media-type=\"application/xhtml+xml\" />"
     spine = spine "\n    <itemref idref=\"file_" luku "\" />"
-    tiedosto = luku ".xhtml"
+    tiedosto = "OEBPS/" luku ".xhtml"
     print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"" > tiedosto
     print "\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" >> tiedosto
     print  "\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n" >> tiedosto
