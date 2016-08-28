@@ -199,7 +199,7 @@ NF > 1       {
 /w:u(.)*\//       {
     kirjoitettava = kirjoitettava "<u>"
     suljettavat = "</u>" suljettavat}
-/\/w:r/       { 
+/\/w:r$/       { 
     kirjoitettava = kirjoitettava suljettavat
     suljettavat = ""}
 END {
