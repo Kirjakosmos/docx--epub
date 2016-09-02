@@ -17,10 +17,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 BEGIN {RS=">"}
-/Target=\"[^\"]+\\.png"/ { 
+/Target=\"[^\"]+\.png"/ { 
     kuvatiedosto = kaiva_merkkijono($0, "Target")
+    gsub("(.)*/","",kuvatiedosto)
     kuvan_id = kaiva_merkkijono($0, "Id")
-    system("mv " kansio "" kuvatiedosto " " kansio "media/" kuvan_id ".png")
+    system("mv " kansio "" kuvatiedosto " " kansio "" kuvan_id ".png")
 }
 function kaiva_merkkijono( rivi, muuttuja ){
     match(rivi, muuttuja "=\"[^\"]+\"")
