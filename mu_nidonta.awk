@@ -33,7 +33,12 @@ BEGIN {
     ++piilolukuja
     manifest = manifest "\n    <item id=\"file_" luku "\" href=\"" luku ".xhtml\" media-type=\"application/xhtml+xml\" />"
     spine = spine "\n    <itemref idref=\"file_" luku "\" />"
-    $0 = " "
+    $0 = " " 
+}
+/KuvatiedostO NyT. Oudon kAnssA AAmut astui./ { 
+    sub("KuvatiedostO NyT. Oudon kAnssA AAmut astui.","",$0)
+    manifest = manifest "\n    <item id=\"kuva_" NR  "\" href=\"kuvat/" $0 "\" media-type=\"image/png\" />"
+    $0 = " " 
 }
 /[^ \n\r\t]+/    {
     ++luku
@@ -69,7 +74,7 @@ END {
     print "<p>Lukemasi epub luotiin Uuden musteen muuntimella:</p>\n<p>www.uusimuste.fi - lukeville ja kirjoittaville ihmisille.</p>">> tiedosto
     print kirjoitettava "</body>\n</html>" >> tiedosto
     close(tiedosto)
-    
+    spine = spine "" kuvat_spineen
     tiedosto = "OEBPS/Content.opf"
     printf("<package version=\"2.0\" xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"tunniste\">\n  <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">\n    <dc:title>%s</dc:title>\n    <dc:language>%s</dc:language>\n    <dc:creator>%s</dc:creator>\n    <dc:identifier id=\"tunniste\">%s</dc:identifier>\n    <meta name=\"cover\" content=\"cover-image\" />\n  </metadata>\n  <manifest>\n    %s\n  </manifest>\n  <spine xmlns=\"http://www.idpf.org/2007/opf\" toc=\"ncx\">\n    %s\n  </spine>\n</package>", nimeke, "fi", kirjoittajat, tunniste, manifest, spine) >> tiedosto
     close(tiedosto)

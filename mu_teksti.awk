@@ -26,6 +26,7 @@ BEGIN {
     virheet = ""  
     kirjoitettava = ""
     seuraavana_otsikko = "jep"
+    kuvia_on = ""
     raportointi = 5000 
 }
 NR == 1      {
@@ -37,7 +38,7 @@ NR == 1      {
     if (kansikuva) {
 	gsub("^(.)*\/", "", kansikuva)
 	while( gsub("^[^\/]*\/", "", kansikuva) ) {   }
-	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"image\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
+	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"Kansikuva\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
 	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
 	print "\n" kannen_nimi >> otsikkokansio "otsikot"
 	++tiedostonro
@@ -202,6 +203,17 @@ NF > 1       {
 /\/w:r$/       { 
     kirjoitettava = kirjoitettava suljettavat
     suljettavat = ""}
+/a:blip( )+r:embed/ {
+    if (!kuvia_on) {
+	kuvia_on = "on"
+	system("mkdir " kansio "kuvat") 
+	system("cp " otsikkokansio "word/media/*.png " kansio "kuvat/")
+    }
+    match($0, "embed=\"[^\"]+\"")
+    kuvan_id = substr($0, RSTART + 2 + length(muuttuja), RLENGTH -3 - length(muuttuja))
+    kirjoitettava = kirjoitettava "<img src=\"OEBPS/kuvat/" kuvan_id ".png\"> \n"
+    print "KuvatiedostO NyT. Oudon kAnssA AAmut astui." kuvan_id ".png" >> otsikkokansio "otsikot"
+}
 END {
     if (!rungossa) {virheet = virheet  "Asiakirjalla ei ollut \"<body> ... </body>\"-rakennetta.\n"}
     kirjoitettava = hieronta(kirjoitettava, suljettavat)

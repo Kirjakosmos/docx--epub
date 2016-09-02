@@ -24,6 +24,10 @@
   mkdir ${kirjoituskansio}/OEBPS/css
   mkdir ${kirjoituskansio}/META-INF
   unzip -qq $1 -d $va_kansio
+  echo "ennen"
+  
+  ./mu_kuvat.awk kansio="${va_kansio}word/media/" ${va_kansio}word/_rels/document.xml.rels
+  echo "ja sitten"
   
   ./mu_tyylit.awk kansio="${kirjoituskansio}/OEBPS/css" ${va_kansio}word/styles.xml
   
