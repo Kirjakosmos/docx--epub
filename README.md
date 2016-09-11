@@ -10,3 +10,5 @@ from command line:
 Second and third arguments are optional. The second command line argument is always interpreted as the desired name of the output, so in order to input a cover image, output name must also be specified.
 
 Requires shell-environment, awk, zip and unzip.
+
+So far only supports images in the text if they are of the png format.
