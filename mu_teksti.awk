@@ -79,7 +79,6 @@ NR == raportointi {
         suljettavat = kirjoitettava = ""
     }
     kirjoitettava = kirjoitettava "<p>"
-    suljettavat = "</p>"
 }
 NF > 1       { 
     if (seuraavana_otsikko) {
@@ -95,17 +94,17 @@ NF > 1       {
     next
 }
 /:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
-     seuraavana_otsikko = "jep"
-     kirjoitettava = hieronta(kirjoitettava, suljettavat)
-     if (kirjoitettava ~ "[^ \n\r\t]+") {
-	 tiedostonro++
-	 luku_loppuu(tiedosto, suljettavat, kirjoitettava)
-	 suljettavat=""
-	 kirjoitettava=""
-	 tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
-     }
-     kirjoitettava = kirjoitettava "<p class=\"h1\">"
-     suljettavat = "</p>"
+    kirjoitettava = kirjoitettava "</p>"
+    seuraavana_otsikko = "jep"
+    kirjoitettava = hieronta(kirjoitettava, suljettavat)
+    if (kirjoitettava ~ "[^ \n\r\t]+") {
+	tiedostonro++
+	luku_loppuu(tiedosto, suljettavat, kirjoitettava)
+	suljettavat=""
+	kirjoitettava=""
+	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+    }
+    kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
 /:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
     kirjoitettava = kirjoitettava "</p><p class=\"h2\">" }
@@ -182,10 +181,9 @@ NF > 1       {
 }
 /^w:p$/ || /^w:p w/   {
     kirjoitettava = kirjoitettava "<p>"
-    suljettavat = "</p>"
 }
 /\/w:p$/      {
-    kirjoitettava = kirjoitettava suljettavat
+    kirjoitettava = kirjoitettava suljettavat "</p>"
     suljettavat = ""
     if (seuraavana_otsikko) {
         gsub("(\n)+", " ", otsikko)
@@ -215,7 +213,7 @@ NF > 1       {
     }
     match($0, "embed=\"[^\"]+\"")
     kuvan_id = substr($0, RSTART + 7 , RLENGTH -8)
-    kirjoitettava = kirjoitettava suljettavat "<img src=\"OEBPS/kuvat/" kuvan_id ".png\"> \n"
+    kirjoitettava = kirjoitettava suljettavat "<img src=\"OEBPS/kuvat/" kuvan_id ".png\" alt=\"\"> \n"
     suljettavat = ""
     print "\nKuvatiedostO NyT. Oudon kAnssA AAmut astui." kuvan_id ".png" >> otsikkokansio "otsikot"
 }
