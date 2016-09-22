@@ -15,3 +15,4 @@
   * ~~tyhjien otsikoiden mahdollistaminen~~
  * MAHDOLLINEN BUGI "ekojen versioiden" käsittelyssä: vain ekan tyylin versioon 0em tulee oikein?
  * Pitää olla mahdollista päättää tyylien ensimmäisen kappaleen sisennyksestä jotenkin! (Väh. jos sisennystä/marginaalia -> ei ekan rivin sisennyksiä)
+ * Tuki jpg-muotoisille kuville 
