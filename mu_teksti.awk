@@ -200,7 +200,7 @@ NF > 1       {
     kirjoitettava = kirjoitettava "<i>"
     suljettavat = "</i>" suljettavat}
 /w:u(.)*\//       {
-    kirjoitettava = kirjoitettava "<span style="text-decoration:underline;">" 
+    kirjoitettava = kirjoitettava "<span style=\"text-decoration:underline;\">" 
     suljettavat = "</span>" suljettavat}
 /\/w:r$/       { 
     kirjoitettava = kirjoitettava suljettavat
