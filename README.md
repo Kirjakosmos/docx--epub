@@ -12,12 +12,12 @@ Second and third arguments are optional. The second command line argument is alw
 Requires shell-environment, awk, zip and unzip.
 
 Supported properties in docx-file:
+* images in the text, but for now only if they are of the png format
+* bold, cursive and underlined sections in text
+* author name, title and language of the document
 * different styles, as long as they follow the naming convention outlined above, retain these properties:
   * relative font-sizes
   * justifications (left, right, centre)
   * marginals before and after paragrahps
   * left marginals
   * cursive or bold by default
-* images in the text, but for now only if they are of the png format
-* bold and cursive in text
-* author name, title and language of the document

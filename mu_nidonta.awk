@@ -71,6 +71,7 @@ END {
     print "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n<title>" tiedostonro  >> tiedosto
     print "</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tyylit.css\" />\n</head>" >> tiedosto
     print "\n<body>" >> tiedosto
+    print "<p><br />***<br /></p>">> tiedosto
     print "<p>Lukemasi epub luotiin Uuden musteen muuntimella:</p>\n<p>www.uusimuste.fi - lukeville ja kirjoittaville ihmisille.</p>">> tiedosto
     print kirjoitettava "</body>\n</html>" >> tiedosto
     close(tiedosto)
