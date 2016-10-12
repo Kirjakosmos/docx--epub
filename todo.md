@@ -1,4 +1,5 @@
 ###Tekemättä
+ * BUGI: Otsikko-tason ja avainsanoilla tehdyn tiedostojaon yhdistäminen ei toimi!
  * rivinvälien yms. arvojen yhteydessä käytettävien yksiköiden tarkistaminen
  * kuvat tekstissä (liian suuritöinen, ehkä?)
  * alaviitteet - loppuviitteiksi kaiketi?
