@@ -74,8 +74,8 @@ NR == raportointi {
     kirjoitettava = hieronta(kirjoitettava, suljettavat)
     if (kirjoitettava ~ "[^ \t\n\r]+") {
 	luku_loppuu(tiedosto, suljettavat, kirjoitettava)
-	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
 	tiedostonro++
+	tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
         suljettavat = kirjoitettava = ""
     }
     kirjoitettava = kirjoitettava "<p>"
