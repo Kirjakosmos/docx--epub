@@ -199,7 +199,7 @@ NF > 1       {
 /w:i\//       {
     kirjoitettava = kirjoitettava "<i>"
     suljettavat = "</i>" suljettavat}
-/w:u(.)*\// || (!($0 ~ "none"))      {  
+/w:u(.)*\// && (!($0 ~ "none"))      {  
     kirjoitettava = kirjoitettava "<span style=\"text-decoration:underline;\">" 
     suljettavat = "</span>" suljettavat}
 /\/w:r$/       { 
