@@ -18,3 +18,4 @@
  * Pitää olla mahdollista päättää tyylien ensimmäisen kappaleen sisennyksestä jotenkin! (Väh. jos sisennystä/marginaalia -> ei ekan rivin sisennyksiä)
  * Tuki jpg-muotoisille kuville 
  * Alleviivausten toimimisen varmentaminen
+ * Otsikoihin välilyönnit tai ei sen mukaan, onko otsikon palasten väleissä oikeasti säilytettäviä välilyöntejä vai ei (nyt oletetaan aina, että on)
