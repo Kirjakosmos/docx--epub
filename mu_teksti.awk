@@ -238,30 +238,30 @@ function tiedoston_alkutekstit(tiedosto) {
 }
 function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
-    gsub(/\n/, "", kirjoitettava)
+    gsub(/\n/, "", kirjoitettava)  
     gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
-    gsub(/<i>(<i>)+/, "<i>", kirjoitettava)
-    gsub(/<b>(<b>)+/, "<b>", kirjoitettava)
-    gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava)
-    gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava)
-    while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   }
-    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   }
-    gsub(/>/, ">\n", kirjoitettava)
-    gsub(/</, "\n<", kirjoitettava)
-    gsub(/h1\">\n/, "h1\">", kirjoitettava)
-    gsub(/\n<b>\n/, "<b>", kirjoitettava)
-    gsub(/\n<i>\n/, "<i>", kirjoitettava)
-    gsub(/\n<\/b>\n/, "</b>", kirjoitettava)
-    gsub(/\n<\/i>\n/, "</i>", kirjoitettava)
-    gsub(/p></, "p>\n<", kirjoitettava)
-    gsub(/><\/p/, ">\n</p", kirjoitettava)
+    gsub(/<i>(<i>)+/, "<i>", kirjoitettava) 
+    gsub(/<b>(<b>)+/, "<b>", kirjoitettava) 
+    gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava) 
+    gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava) 
+    while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   } 
+    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   } 
+    gsub(/>/, ">\n", kirjoitettava) 
+    gsub(/</, "\n<", kirjoitettava) 
+    gsub(/\n<b>\n/, "<b>", kirjoitettava) 
+    gsub(/\n<i>\n/, "<i>", kirjoitettava) 
+    gsub(/\n<\/b>\n/, "</b>", kirjoitettava) 
+    gsub(/\n<\/i>\n/, "</i>", kirjoitettava) 
+    gsub(/p></, "p>\n<", kirjoitettava) 
+    gsub(/><\/p/, ">\n</p", kirjoitettava) 
     while (gsub(/<p[^<]*>[\n]*<\/p>/, "", kirjoitettava)) {   } 
-    gsub(/>[\n]+</, ">\n<", kirjoitettava)
-    gsub(/<p[^h>]*>/, "&\r", kirjoitettava)
-    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava)
-    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava)
-    gsub(/\r/, "", kirjoitettava)
-    gsub(/\n[\n]{1, }/, "\n", kirjoitettava)
+    gsub(/>[\n]+</, ">\n<", kirjoitettava) 
+    gsub(/<p[^h>]*>/, "&\r", kirjoitettava) 
+    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava) 
+    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) 
+    gsub(/\r/, "", kirjoitettava) 
+    gsub(/\n[\n]+/, "\n", kirjoitettava) 
+    gsub(/<\/p>[\t\n\r\f\v]*</, "</p>\n<", kirjoitettava) 
     return kirjoitettava
 }
 function luku_loppuu(tiedosto, suljettavat, kirjoitettava) {    

@@ -194,7 +194,7 @@ NF > 1       {
     }
 }
 /^w:tab\//   {
-    kirjoitettava = kirjoitettava "&nbsp;&nbsp;&nbsp;&nbsp;"
+    kirjoitettava = kirjoitettava "&nbsp;&nbsp;&nbsp;&nbsp;" #
 }
 /w:b\//       {
     kirjoitettava = kirjoitettava "<b>"
@@ -258,7 +258,7 @@ function hieronta(kirjoitettava, suljettavat) {
     gsub(/\n<\/i>\n/, "</i>", kirjoitettava)
     gsub(/p></, "p>\n<", kirjoitettava)
     gsub(/><\/p/, ">\n</p", kirjoitettava)
-    while (gsub(/<p>[\n]*<\/p>/, "", kirjoitettava)) {   }
+#    while (gsub(/<p>[\n]*<\/p>/, "", kirjoitettava)) {   }
     gsub(/>[\n]+</, ">\n<", kirjoitettava)
     gsub(/<p[^h>]*>/, "&\r", kirjoitettava)
     gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava)
