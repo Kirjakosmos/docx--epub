@@ -5,7 +5,7 @@ Splits the docx into chapters in the output-epub at headings marked with "Otsikk
 
 ###USAGE
 from command line:  
-./muunnos.sh input.docx [output_name] [cover_image.jpg]
+./muunnos.sh input.docx [-u output_name] [-k cover_image.jpg]
 
 Second and third arguments are optional. The second command line argument is always interpreted as the desired name of the output, so in order to input a cover image, output name must also be specified.
 
