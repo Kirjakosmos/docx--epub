@@ -21,3 +21,13 @@ Supported properties in docx-file:
   * marginals before and after paragrahps
   * left marginals
   * cursive or bold by default
+
+
+###INNER WORKINGS
+
+The script **muunnos.sh** juggles the following five AWK scripts.  
+**mu_kuvat.awk** digs through the docx contents to prepare the images to be included in the epub.  
+**mu_tyylit.awk** finds the properties for styles for the epubs css.  
+**mu_teksti.awk** creates xhtml files from the text contents of the docx.  
+**mu_metatiedot.awk** checks for usable metadata in the docx.  
+Finally **mu_nidonta.awk** combines the elements prepared by the previous scripts and adds the necessary bits to create a valid epub file.
