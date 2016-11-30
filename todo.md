@@ -19,3 +19,4 @@
  * Tuki jpg-muotoisille kuville 
  * Alleviivausten toimimisen varmentaminen
  * Otsikoihin välilyönnit tai ei sen mukaan, onko otsikon palasten väleissä oikeasti säilytettäviä välilyöntejä vai ei (nyt oletetaan aina, että on)
+ * mu_metatiedot toimimaan muuttujilla, jolloin voi kutsun mukana toimittaa annettuja metatietoja
