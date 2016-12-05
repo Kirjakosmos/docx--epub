@@ -28,7 +28,7 @@
 epubversio=2
 muunnostila=1
 kirjoittajat="tuntematon"
-while [ "$1" !="" ] 
+while [ "$1" != "" ] 
 do
     case $1 in
         -u | -o | --ulos )  
