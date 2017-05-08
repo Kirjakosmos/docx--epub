@@ -94,7 +94,7 @@ done
   else
     echo "Tiedosto ${1} ei sisällä metatietoja, muunnetaan käyttäen oletusarvoja."
     cd $kirjoituskansio
-    ./mu_nidonta nimeke="${teosnimi:-$tunniste}" kirjoittajat="${kirjoittajat}" tunniste="${tunniste}" kansikuva="${kansikuva:-""}" ../${va_kansio}otsikot  
+    ./mu_nidonta.awk nimeke="${teosnimi:-$tunniste}" kirjoittajat="${kirjoittajat}" tunniste="${tunniste}" kansikuva="${kansikuva:-""}" ../${va_kansio}otsikot  
   fi  
   cd .. 
   
