@@ -68,6 +68,7 @@ NR == raportointi {
 /wp:align$/ { $1 = "" }
 /¤¤¤o¤¤¤/   {
     seuraavana_otsikko = "jep"
+    pakotettu_luku = "jep"
     gsub(/¤¤¤o¤¤¤/, "", $0)
     kirjoitettava = kirjoitettava suljettavat "</p>"
     suljettavat = ""
@@ -185,12 +186,17 @@ NF > 1       {
 /\/w:p$/      {
     kirjoitettava = kirjoitettava suljettavat "</p>"
     suljettavat = ""
-    if (seuraavana_otsikko) {
+    if (seuraavana_otsikko && otsikko ~ /[^ \n\r\t]+$/) {
         gsub("(\n)+", " ", otsikko)
         otsikko = "\n" otsikko
-	if (otsikko ~ /^[ \n\r\t]+$/) {otsikko = otsikko "eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti."}
+
         print otsikko "" >> otsikkokansio "otsikot"
-        otsikko = seuraavana_otsikko = ""
+        otsikko = seuraavana_otsikko = pakotettu_luku = ""
+    }
+    if (seuraavana_otsikko && pakotettu_luku) {
+	otsikko = otsikko "eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti."
+	print otsikko "" >> otsikkokansio "otsikot"
+        otsikko = seuraavana_otsikko = pakotettu_luku = ""
     }
 }
 /w:b\//       {
