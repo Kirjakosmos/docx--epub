@@ -246,6 +246,7 @@ function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
     gsub(/\n/, "", kirjoitettava)
     gsub(/<p>[ \t\f\n\r\v]*<\/p>/, "<p><br /></p>", kirjoitettava)
+    gsub(/<\/p><p><br \/><\/p><p>/, "<br /><br /></p><p>", kirjoitettava)
     while (gsub(/<p>[<br \/>]*<\/p>$/, "", kirjoitettava)) {   } 
     gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
     gsub(/<i>(<i>)+/, "<i>", kirjoitettava) 
