@@ -68,7 +68,7 @@ NR == raportointi {
 /wp:align$/ { $1 = "" }
 /¤¤¤o¤¤¤/   {
     seuraavana_otsikko = "jep"
-    gsub(/Â¤Â¤Â¤oÂ¤Â¤Â¤/, "", $0)
+    gsub(/¤¤¤o¤¤¤/, "", $0)
     kirjoitettava = kirjoitettava suljettavat "</p>"
     suljettavat = ""
     kirjoitettava = hieronta(kirjoitettava, suljettavat)
@@ -224,7 +224,7 @@ END {
     if (virheet) {
         print "\nTiedoston tekstin lukemisessa kohdattiin seuraavat virheet:\n" virheet
     } else {
-        print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisÃ¤llysluetteloon.\n"
+        print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
     }
 }
  
