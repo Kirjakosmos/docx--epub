@@ -244,14 +244,15 @@ function tiedoston_alkutekstit(tiedosto) {
 }
 function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
-    gsub(/\n/, "", kirjoitettava)  
+    gsub(/\n/, "", kirjoitettava)
+    while (gsub(/<p>[<br \/>]*<\/p>$/, "", kirjoitettava)) {   } 
     gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
     gsub(/<i>(<i>)+/, "<i>", kirjoitettava) 
     gsub(/<b>(<b>)+/, "<b>", kirjoitettava) 
     gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava) 
     gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava) 
     while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   } 
-    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   } 
+    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   }
     gsub(/>/, ">\n", kirjoitettava) 
     gsub(/</, "\n<", kirjoitettava) 
     gsub(/\n<b>\n/, "<b>", kirjoitettava) 
@@ -267,7 +268,7 @@ function hieronta(kirjoitettava, suljettavat) {
     gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) 
     gsub(/\r/, "", kirjoitettava) 
     gsub(/\n[\n]+/, "\n", kirjoitettava) 
-    gsub(/<\/p>[\t\n\r\f\v]*</, "</p>\n<", kirjoitettava) 
+    gsub(/<\/p>[\t\n\r\f\v]*</, "</p>\n<", kirjoitettava)
     return kirjoitettava
 }
 function luku_loppuu(tiedosto, suljettavat, kirjoitettava) {    
