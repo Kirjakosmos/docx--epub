@@ -16,6 +16,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# Muovaa docx:n tekstiosuudesta xhtml-tiedostot. Jako tiedostoihin perustuu otsikkotyyleihin ja rivinsisäisiin kommentteihin.
+# Saa syötteet:
+#  otsikkokansio="${va_kansio}"  <- Tänne kirjoitetaan lukujen otsikot tiedostoon myöhempää vaihetta varten.
+#  kansikuva="${3:-""}"          <- Kansikuva, jos sellainen on. 
+
 BEGIN {
     OFS = ""
     ORS = ""
@@ -36,10 +42,10 @@ NR == 1      {
 }
 NR == 1      {
     if (kansikuva) {
-	gsub("^(.)*\/", "", kansikuva)
-	while( gsub("^[^\/]*\/", "", kansikuva) ) {   }
+	gsub("^(.)*\/", "", kansikuva)# Suhteellinen polku pois kansikuvasta.
+	while( gsub("^[^\/]*\/", "", kansikuva) ) {   }# Suhteellinen polku pois kansikuvasta.
 	print "<div class=\"d-cover\" style=\"text-align:center;\">\n<img src=\"" kansikuva "\" alt=\"Kansikuva\" height=\"100%\"/>\n</div>\n</body>\n</html>" >> tiedosto
-	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)
+	kannen_nimi = substr(kansikuva, 1, length(kansikuva)-4)# ".jpg" pois sisällysluettelosta.
 	print "\n" kannen_nimi >> otsikkokansio "otsikot"
 	++tiedostonro
 	close(tiedosto)
@@ -94,6 +100,8 @@ NF > 1       {
     kirjoitettava = kirjoitettava "<p><br /></p>"
     next
 }
+
+# uusi luku
 /:pStyle w:val=\"[Hh]eading( )?1/ || /:pStyle w:val=\"[Oo]tsikko[ 1]?\"/  {
     kirjoitettava = kirjoitettava "</p>"
     seuraavana_otsikko = "jep"
@@ -107,6 +115,8 @@ NF > 1       {
     }
     kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
+
+# väliotsikko
 /:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
     kirjoitettava = kirjoitettava "</p><p class=\"h2\">" }
 /:pStyle w:val=\"Heading( )?3/ || /:pStyle w:val=\"[Oo]tsikko( )?3\"/  {
@@ -115,6 +125,8 @@ NF > 1       {
     kirjoitettava = kirjoitettava "</p><p class=\"h4\">" }
 /:pStyle w:val=\"Heading( )?5/ || /:pStyle w:val=\"[Oo]tsikko( )?5\"/  {
     kirjoitettava = kirjoitettava "</p><p class=\"h5\">" }
+
+# itse määriteltävät tyylit
 /:pStyle w:val=\"[Tt]yyli( )?2/ || /:pStyle w:val=\"[Ss]tyle2\"/  {
     kirjoitettava = kirjoitettava "</p><p class=\"tyyli2\">" }
 /:pStyle w:val=\"[Tt]yyli( )?3/ || /:pStyle w:val=\"[Ss]tyle3\"/  {
@@ -123,9 +135,14 @@ NF > 1       {
     kirjoitettava = kirjoitettava "</p><p class=\"tyyli4\">" }
 /:pStyle w:val=\"[Tt]yyli( )?5/ || /:pStyle w:val=\"[Ss]tyle5\"/  {
     kirjoitettava = kirjoitettava "</p><p class=\"tyyli5\">" }
+
+# rivinvaihto
 /w:br\// {kirjoitettava = kirjoitettava "<br />"}
+
+# numeroidut listat
+# Numeroi kaikki listat 1., 2., ... vaikka käsikirjoituksessa olisikin vaikkapa i, ii, ...
 /w:numId w:val=/  {
-    if (!(numeroinnit)) 
+    if (!(numeroinnit)) # Luetaan numeroinnit, jos ei vielä ole luettu.
     {
 	numeroinnit = otsikkokansio "word/numbering.xml"
 	while (getline rivi < numeroinnit)
@@ -135,23 +152,23 @@ NF > 1       {
 		match(rivi, "=\"(.)+\"")
 		numId = substr( rivi, RSTART +2, RLENGTH -3 ) + 0
 	    }
-	    if (rivi ~ /w:lvl w:ilvl/) 
+	    if (rivi ~ /w:lvl w:ilvl/) # Uusi numerointi
 	    {
 		match(rivi, "=\"(.)+\"")
 		listataso = substr( rivi, RSTART +2, RLENGTH -3 ) + 0
 	    }
-	    if (rivi ~ /w:start w:val=/ && listaformaatti != "bullet") 
+	    if (rivi ~ /w:start w:val=/ && listaformaatti != "bullet") # Luettavan numeroinnin alkuarvo
 	    {
 		match(rivi, "=\"(.)+\"")
 		merkki = substr( rivi, RSTART +2, RLENGTH -3 )
 		listamerkit[numId " " listataso] = merkki
 	    }
-	    if (rivi ~ /w:numFmt/) 
+	    if (rivi ~ /w:numFmt/) # Luettavan numeroinnin muoto
 	    {
 		match(rivi, "=\"(.)+\"")
 		listaformaatti = substr( rivi, RSTART +2, RLENGTH -3 )
 	    }
-	    if (rivi ~ /w:lvlText/ && listaformaatti == "bullet") 
+	    if (rivi ~ /w:lvlText/ && listaformaatti == "bullet") # Numeroimattoman lisatn listamerkki
 	    {
 		match(rivi, "=\"(.)+\"")
 		merkki = substr( rivi, RSTART +2, RLENGTH -3 )
@@ -162,17 +179,18 @@ NF > 1       {
 	print " \n  Alavaihe bb) suoritettu: asiakirjan numerointi luettu."
     }   
 }
-/w:ilvl w:val=/  { 
+/w:ilvl w:val=/  {  # Uusi listataso
     match($0, "=\"(.)+\"")
     ilvl = substr( $0, RSTART +2, RLENGTH -3 )
 }
-/w:numId w:val=/  { 
+/w:numId w:val=/  { # Uusi listanimi
    match($0, "=\"(.)+\"")
    numId = substr( $0, RSTART +2, RLENGTH -3 )
 }
-/w:numId w:val=/  { 
+/w:numId w:val=/  { # Kirjoitetaan oikea teksti listanimen mukaisesti.
     kirjoitettava = kirjoitettava " " listamerkit[numId " " ilvl]
-    if (listamerkit[numId " " ilvl]+0 != 0 || listamerkit[numId " " ilvl] == "0") 
+    if (listamerkit[numId " " ilvl]+0 != 0 || listamerkit[numId " " ilvl] == "0")
+    # Numeroiduissa listoissa kasvatetaan laskurin arvoa.
     {
 	if (seuraavana_otsikko == "jep") { otsikko = otsikko " " listamerkit[numId " " ilvl] ". "}
 	kirjoitettava = kirjoitettava "."
@@ -180,6 +198,8 @@ NF > 1       {
     }
     kirjoitettava = kirjoitettava " "
 }
+
+# kappale
 /^w:p$/ || /^w:p w/   {
     kirjoitettava = kirjoitettava "<p>"
 }
@@ -199,22 +219,32 @@ NF > 1       {
         otsikko = seuraavana_otsikko = pakotettu_luku = ""
     }
 }
+
+# lihavointi
 /w:b\//       {
     kirjoitettava = kirjoitettava "<b>"
     suljettavat = "</b>" suljettavat}
+
+# kursiivi
 /w:i\//       {
     kirjoitettava = kirjoitettava "<i>"
     suljettavat = "</i>" suljettavat}
-/w:u(.)*\// && (!($0 ~ "none"))      {  
+
+# alleviivaus
+/w:u(.)*\// && (!($0 ~ "none"))      {  # Jäljempikin testi tarpeen, koska alleviivaus arvolla "none" -> ei alleviivausta :P
     kirjoitettava = kirjoitettava "<span style=\"text-decoration:underline;\">" 
     suljettavat = "</span>" suljettavat}
+
+# "run":in loppu - yhdellä runilla on samat tekstiominaisuudet
 /\/w:r$/       { 
     kirjoitettava = kirjoitettava suljettavat
     suljettavat = ""}
+
+# kuvat (vain png toistaiseksi)
 /a:blip( )+r:embed/ {
     if (!kuvia_on) {
 	kuvia_on = "on"
-	system("mkdir " kansio "kuvat") 
+	system("mkdir " kansio "kuvat") # Luodaan kuvakansio vasta, jos kuvia tulee vastaan.
 	system("cp " otsikkokansio "word/media/*.png " kansio "kuvat/")
     }
     match($0, "embed=\"[^\"]+\"")
@@ -233,7 +263,8 @@ END {
         print "\nVaihe b) onnistui: tiedoston teksti luettiin ja luotiin " tiedostonro + 0 " otsaketta sisällysluetteloon.\n"
     }
 }
- 
+
+# Tiedoston alkuun XHTML:n vaatima tiedostomäärittely. 
 function tiedoston_alkutekstit(tiedosto) {
     print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"" > tiedosto
     print "\n\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" >> tiedosto
@@ -242,41 +273,47 @@ function tiedoston_alkutekstit(tiedosto) {
     print "</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tyylit.css\" />\n</head>" >> tiedosto
     print "\n<body>" >> tiedosto
 }
+
+# Tekstin siistiminen ennen kirjoittamista.
 function hieronta(kirjoitettava, suljettavat) {
     kirjoitettava = kirjoitettava "" suljettavat
-    gsub(/\n/, "", kirjoitettava)
-    gsub(/<p>[ \t\f\n\r\v]*<\/p>/, "<p><br /></p>", kirjoitettava)
-    gsub(/<\/p><p><br \/><\/p><p>/, "<br /><br /></p><p>", kirjoitettava)
+    gsub(/\n/, "", kirjoitettava) # Jos kappaleenvaihtoja eksynyt mukaan, otetaan pois.
+    gsub(/<p>[ \t\f\n\r\v]*<\/p>/, "<p><br /></p>", kirjoitettava) # Tyhjät merkit pois rivinvaihtokappaleista.
+    gsub(/<\/p><p><br \/><\/p><p>/, "<br /><br /></p><p>", kirjoitettava) 
     while (gsub(/<p>[<br \/>]*<\/p>$/, "", kirjoitettava)) {   } 
     gsub(/<p>[ \t\f\n\r\v]*<br \/>[ \t\f\n\r\v]*<\/p>[ \t\f\n\r\v]*<p>/, "<p>\n<br />\n", kirjoitettava)  
-    gsub(/<i>(<i>)+/, "<i>", kirjoitettava) 
-    gsub(/<b>(<b>)+/, "<b>", kirjoitettava) 
-    gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava) 
-    gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava) 
-    while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   } 
-    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   }
-    gsub(/>/, ">\n", kirjoitettava) 
-    gsub(/</, "\n<", kirjoitettava) 
-    gsub(/\n<b>\n/, "<b>", kirjoitettava) 
-    gsub(/\n<i>\n/, "<i>", kirjoitettava) 
-    gsub(/\n<\/b>\n/, "</b>", kirjoitettava) 
-    gsub(/\n<\/i>\n/, "</i>", kirjoitettava) 
-    gsub(/p></, "p>\n<", kirjoitettava) 
-    gsub(/><\/p/, ">\n</p", kirjoitettava) 
-    while (gsub(/<p[^<]*>[\n]*<\/p>/, "", kirjoitettava)) {   } 
-    gsub(/>[\n]+</, ">\n<", kirjoitettava) 
-    gsub(/<p[^h>]*>/, "&\r", kirjoitettava) 
-    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava) 
-    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) 
-    gsub(/\r/, "", kirjoitettava) 
-    gsub(/\n[\n]+/, "\n", kirjoitettava) 
-    gsub(/<\/p>[\t\n\r\f\v]*</, "</p>\n<", kirjoitettava)
+    gsub(/<i>(<i>)+/, "<i>", kirjoitettava) # Ylimääräiset kursiivi-...
+    gsub(/<b>(<b>)+/, "<b>", kirjoitettava) # ja lihavointi-tägit pois.
+    gsub(/<\/i>(<\/i>)+/, "</i>", kirjoitettava) # Ylimääräiset kursiivinsulku-...
+    gsub(/<\/b>(<\/b>)+/, "</b>", kirjoitettava) # ja lihavoinninsulku-tägit pois.
+    while (gsub(/<b><\/b>/, "", kirjoitettava) || gsub(/<i><\/i>/, "", kirjoitettava)) {   } # Tyhjät auki-kiinni-tägit pois.
+    while (gsub(/<\/i><i>/, "", kirjoitettava) || gsub(/<\/b><b>/, "", kirjoitettava)) {   } # Turhat kiinni-auki-parit pois.
+    gsub(/>/, ">\n", kirjoitettava) # Lisätään nokkien yhteyteen...
+    gsub(/</, "\n<", kirjoitettava) # rivinvaihdot luettavuuden lisäämiseksi.
+    gsub(/\n<b>\n/, "<b>", kirjoitettava) # Otetaan...
+    gsub(/\n<i>\n/, "<i>", kirjoitettava) # ...juuri lisätyt rivinvaihdot pois...
+    gsub(/\n<\/b>\n/, "</b>", kirjoitettava) # ... tägien...
+    gsub(/\n<\/i>\n/, "</i>", kirjoitettava) # ...ympäriltä.
+    gsub(/p></, "p>\n<", kirjoitettava) # Jos kappale alkaa...
+    gsub(/><\/p/, ">\n</p", kirjoitettava) # ...tai loppuu muotoiluun, palautetaan äsken poistettu rivinvaihto.
+    while (gsub(/<p[^<]*>[\n]*<\/p>/, "", kirjoitettava)) {   } # Poistaa tyhjät kappaleet.
+    gsub(/>[\n]+</, ">\n<", kirjoitettava) # Poistetaan lukemista helpottavista rivinvaihdoista turhat peräkkäiset.
+    gsub(/<p[^h>]*>/, "&\r", kirjoitettava) # Merkitään muiden kuin otsikkotason kappaleiden alut väliaikaisesti \r-merkillä seuraavia vaiheita varten.
+    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava) # Tehdään otsikkotasoa seuraavista kappaleista "eka"-luokkaa aina ensimmäiseen \r-merkintään saakka. Siis vain ensimmäisestä otsikkotasoa seuraavasta kappaleesta tulee "eka"-luokkaa.
+    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) # Poistetaan syntyneet tuplaluokat.
+    gsub(/\r/, "", kirjoitettava) # Poistetaan väliaikaiset \r-merkinnät.
+    gsub(/\n[\n]+/, "\n", kirjoitettava) # Pelkkiä \n-merkkejä sisältäviin kappaleisiin jää vain yksi \n-merkki.
+    gsub(/<\/p>[\t\n\r\f\v]*</, "</p>\n<", kirjoitettava) # Poistetaan ylimääräisiä (sisällön ulkopuolisia) tyhjiä merkkejä. 
     return kirjoitettava
 }
+
+# Tiedoston loppuun tulee päälle jääneiden tägien sulkimet. Sulkee tiedoston. 
 function luku_loppuu(tiedosto, suljettavat, kirjoitettava) {    
     print kirjoitettava "</body>\n</html>" >> tiedosto
     close(tiedosto)
 }
+
+# Päivittää käsiteltävänä olevan tiedoston nimen ja kirjoituttaa siihen alkutekstit.
 function seuraava_luku_alkaa(tiedosto, tiedostonro, kansio) {
     tiedosto = kansio tiedostonro ".xhtml"
     tiedoston_alkutekstit(tiedosto)
