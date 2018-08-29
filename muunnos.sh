@@ -38,7 +38,7 @@
 
 # Luetaan komentoriviparametrit muuttujiksi.  
 epubversio=2
-muunnostila=1
+muunnostila=0
 kirjoittajat="tuntematon"
 while [ "$1" != "" ] 
 do
@@ -51,12 +51,9 @@ do
 	    shift
             kansikuva=$1
             ;;
-        -r | --runo )  ## Toteuttamatta!
-	    shift
-	    muunnostila=2
-	    echo "Epubia ei luotu."
-	    echo "Runomuuntimen toiminnallisuus on vielä työn alla."
-            exit 1
+        -r | --runo )  ## Enimmäkseen toteuttamatta!
+	    muunnostila=1
+	    echo "Runomuuntimen toiminnallisuus -r valittu: teksti käsitellään säkeinä, ei kappaleina."
 	    ;;
         -v3 | --versio | --epub3 )  ## Toteuttamatta!
 	    epubversio=3
@@ -96,8 +93,8 @@ kirjoituskansio=./muuntimen_kirjoituskansio.${$}$(date +%N)/ # Tänne menee mene
   
 # Muokataan kuvatiedostojen nimet sopiviksi.  
   ./mu_kuvat.awk kansio="${va_kansio}word/media/" ${va_kansio}word/_rels/document.xml.rels
-# Puretaan ennalta määrätyt tyylit open xml -muodosta epubin css:ksi.  
-  ./mu_tyylit.awk kansio="${kirjoituskansio}/OEBPS/css" ${va_kansio}word/styles.xml
+  # Puretaan ennalta määrätyt tyylit open xml -muodosta epubin css:ksi.
+  ./mu_tyylit.awk kansio="${kirjoituskansio}/OEBPS/css" runo="${muunnostila}" ${va_kansio}word/styles.xml
 # Tehdään varsinaisesta tekstistä xhtml:ää.
   ./mu_teksti.awk kansio="${kirjoituskansio}" otsikkokansio="${va_kansio}" kansikuva="${kansikuva:-""}" ${va_kansio}word/document.xml
   tunniste=um${$}t$(date +%s) # Yksilöivä tunnus teokselle (vrt. ISBN)

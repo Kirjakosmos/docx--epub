@@ -93,12 +93,16 @@ BEGIN {
 }
 END {
     if (kirjoitetaan=="joo") {
-        print "\nSyÃ¶tteen tyyleissÃ¤ on virhe.\n"
+        print "\nSyÃ¶tteen tyyleissä on virhe.\n"
     } else {
         print "\nVaihe a) onnistui: tyylitiedosto luotiin."
     }
     css = "\n@page { margin: 5pt ; }\n" css
-    css = " p { text-indent: 1.5em;\n margin-top: 0.1em ; }\n" css
+    if (runo) {
+	css = " p { text-indent: 0em;\n margin-top: 0.1em ; }\n" css
+    } else {
+	css = " p { text-indent: 1.5em;\n margin-top: 0.1em ; }\n" css	
+    }
     css = css " p.eka { text-indent: 0em;\n margin-top: 0.6em ; }"
     css = " html, body { height: 100% ;\n margin: 0 ;\n padding: 0 ;\n border-width: 0 ;\n }\n" css
     tiedosto = kansio "/tyylit.css"
