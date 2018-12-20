@@ -31,7 +31,7 @@
  ## teosnimi           - teoksen varsinainen (ei tiedoston-) nimi, saatetaan kaivaa metatiedoista, oletuksena tunniste-rimpsu.
  ## va_kansio          - Tänne menee purettu docx ja muut väliaikaiset tiedostot.
  ## kirjoituskansio    - Tänne menee menee valmistuvan epubin osaset.   
-  
+ ## kuvatunnus         - Teoksessa on jpg-muotoisia kuvia. Oletusmuotona on png.   
   
   
   
@@ -40,6 +40,7 @@
 epubversio=2
 muunnostila=0
 kirjoittajat="tuntematon"
+kuvatunnus="png"
 while [ "$1" != "" ] 
 do
     case $1 in
@@ -76,6 +77,10 @@ do
 	    shift
 	    teosnimi=$1 ## Toteuttamatta!
 	    ;;
+        --kuvamuoto )
+	    shift
+	    kuvatunnus=$1
+	    ;;
         * )   
             kohde=$1
     esac
@@ -92,20 +97,20 @@ kirjoituskansio=./muuntimen_kirjoituskansio.${$}$(date +%N)/ # Tänne menee mene
 
   
 # Muokataan kuvatiedostojen nimet sopiviksi.  
-  ./mu_kuvat.awk kansio="${va_kansio}word/media/" ${va_kansio}word/_rels/document.xml.rels
+  ./mu_kuvat.awk kansio="${va_kansio}word/media/" kuvamuoto="${kuvatunnus}" ${va_kansio}word/_rels/document.xml.rels
   # Puretaan ennalta määrätyt tyylit open xml -muodosta epubin css:ksi.
   ./mu_tyylit.awk kansio="${kirjoituskansio}/OEBPS/css" runo="${muunnostila}" ${va_kansio}word/styles.xml
 # Tehdään varsinaisesta tekstistä xhtml:ää.
-  ./mu_teksti.awk kansio="${kirjoituskansio}" otsikkokansio="${va_kansio}" kansikuva="${kansikuva:-""}" ${va_kansio}word/document.xml
+  ./mu_teksti.awk kansio="${kirjoituskansio}" kuvamuoto="${kuvatunnus}" otsikkokansio="${va_kansio}" kansikuva="${kansikuva:-""}" ${va_kansio}word/document.xml
   tunniste=um${$}t$(date +%s) # Yksilöivä tunnus teokselle (vrt. ISBN)
   if [ -f ${va_kansio}docProps/core.xml ];  # Tarkistetaan, onko metatietoja olemassa - joillain editoreilla ei synny. Varsinaisen epubin luova mu_nidonta tarvitsee jotkin metatiedot.
   then
       cd $kirjoituskansio
-      ../mu_metatiedot.awk tunniste="${tunniste}" otsikot="${va_kansio}otsikot" nimi="${kohde}" kansikuva="${kansikuva:-""}" ../${va_kansio}docProps/core.xml  # Jos metatiedot on, kaivetaan ne esiin. mu_metatiedot kutsuu mu_nidontaa suoraan. 
+      ../mu_metatiedot.awk tunniste="${tunniste}" kuvamuoto="${kuvatunnus}" otsikot="${va_kansio}otsikot" nimi="${kohde}" kansikuva="${kansikuva:-""}" ../${va_kansio}docProps/core.xml  # Jos metatiedot on, kaivetaan ne esiin. mu_metatiedot kutsuu mu_nidontaa suoraan. 
   else
     echo "Tiedosto ${1} ei sisällä metatietoja, muunnetaan käyttäen oletusarvoja."
     cd $kirjoituskansio
-    ../mu_nidonta.awk nimeke="${teosnimi:-$tunniste}" kirjoittajat="${kirjoittajat}" tunniste="${tunniste}" kansikuva="${kansikuva:-""}" ../${va_kansio}otsikot  # Jos metatietoja ei ole, kutsutaan mu_nidontaa oletusarvoin. 
+    ../mu_nidonta.awk nimeke="${teosnimi:-$tunniste}" kuvamuoto="${kuvatunnus}" kirjoittajat="${kirjoittajat}" tunniste="${tunniste}" kansikuva="${kansikuva:-""}" ../${va_kansio}otsikot  # Jos metatietoja ei ole, kutsutaan mu_nidontaa oletusarvoin. 
   fi  
   cd .. # Kansiossa käytiin, jotta saatiin epubiin oikeat suhteelliset polut.
   

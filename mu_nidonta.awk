@@ -37,7 +37,7 @@ BEGIN {
 }
 /KuvatiedostO NyT. Oudon kAnssA AAmut astui./ { 
     sub("KuvatiedostO NyT. Oudon kAnssA AAmut astui.","",$0)
-    manifest = manifest "\n    <item id=\"kuva_" NR  "\" href=\"kuvat/" $0 "\" media-type=\"image/png\" />"
+    manifest = manifest "\n    <item id=\"kuva_" NR  "\" href=\"kuvat/" $0 "\" media-type=\"image/" kuvamuoto "\" />"
     $0 = " " 
 }
 /[^ \n\r\t]+/    {

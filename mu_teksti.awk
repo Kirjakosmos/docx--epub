@@ -240,18 +240,18 @@ NF > 1       {
     kirjoitettava = kirjoitettava suljettavat
     suljettavat = ""}
 
-# kuvat (vain png toistaiseksi)
+# kuvat (oletuksena png, komentoriviparametrilla -jpg)
 /a:blip( )+r:embed/ {
     if (!kuvia_on) {
 	kuvia_on = "on"
 	system("mkdir " kansio "kuvat") # Luodaan kuvakansio vasta, jos kuvia tulee vastaan.
-	system("cp " otsikkokansio "word/media/*.png " kansio "kuvat/")
+	system("cp " otsikkokansio "word/media/*." kuvamuoto " " kansio "kuvat/")
     }
     match($0, "embed=\"[^\"]+\"")
     kuvan_id = substr($0, RSTART + 7 , RLENGTH -8)
-    kirjoitettava = kirjoitettava suljettavat "<div>\n<img src=\"kuvat/" kuvan_id ".png\" alt=\"\">\n</div>\n</img> \n"
+    kirjoitettava = kirjoitettava suljettavat "<div>\n<img src=\"kuvat/" kuvan_id "." kuvamuoto "\" alt=\"\">\n</div>\n</img> \n"
     suljettavat = ""
-    print "\nKuvatiedostO NyT. Oudon kAnssA AAmut astui." kuvan_id ".png" >> otsikkokansio "otsikot"
+    print "\nKuvatiedostO NyT. Oudon kAnssA AAmut astui." kuvan_id "." kuvamuoto >> otsikkokansio "otsikot"
 }
 END {
     if (!rungossa) {virheet = virheet  "Asiakirjalla ei ollut \"<body> ... </body>\"-rakennetta.\n"}

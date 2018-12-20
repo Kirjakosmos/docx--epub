@@ -39,6 +39,7 @@ END {
     if (kansikuva) {
         komento = komento " kansikuva=\"" kansikuva "\""
     }
+    komento = komento " kuvamuoto=\"" kuvamuoto "\""
     komento = komento  " tunniste=\"" tunniste "\" ../" otsikot
     print "Vaihe c) onnistui: metatiedot löytyivät."
     system(komento) 
