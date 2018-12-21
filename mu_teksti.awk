@@ -20,7 +20,8 @@
 # Muovaa docx:n tekstiosuudesta xhtml-tiedostot. Jako tiedostoihin perustuu otsikkotyyleihin ja rivinsisäisiin kommentteihin.
 # Saa syötteet:
 #  otsikkokansio="${va_kansio}"  <- Tänne kirjoitetaan lukujen otsikot tiedostoon myöhempää vaihetta varten.
-#  kansikuva="${3:-""}"          <- Kansikuva, jos sellainen on. 
+#  kansikuva="${3:-""}"          <- Kansikuva, jos sellainen on.
+
 
 BEGIN {
     OFS = ""
@@ -86,6 +87,14 @@ NR == raportointi {
         suljettavat = kirjoitettava = ""
     }
     kirjoitettava = kirjoitettava "<p>"
+}
+/p-!o!-q/   { # Manuaalisesti runoksi merkityn alueen alku tai loppu
+    gsub(/p-!o!-q/, "", $0)
+    if (runoa) {
+	runoa = ""
+    } else {
+	runoa = "on"
+    }
 }
 NF > 1       { 
     if (seuraavana_otsikko) {
@@ -313,10 +322,15 @@ function hieronta(kirjoitettava, suljettavat) {
     gsub(/><\/p/, ">\n</p", kirjoitettava) # ...tai loppuu muotoiluun, palautetaan äsken poistettu rivinvaihto.
     while (gsub(/<p[^<]*>[\n]*<\/p>/, "", kirjoitettava)) {   } # Poistaa tyhjät kappaleet.
     gsub(/>[\n]+</, ">\n<", kirjoitettava) # Poistetaan lukemista helpottavista rivinvaihdoista turhat peräkkäiset.
-    gsub(/<p[^h>]*>/, "&\r", kirjoitettava) # Merkitään muiden kuin otsikkotason kappaleiden alut väliaikaisesti \r-merkillä seuraavia vaiheita varten.
-    gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava) # Tehdään otsikkotasoa seuraavista kappaleista "eka"-luokkaa aina ensimmäiseen \r-merkintään saakka. Siis vain ensimmäisestä otsikkotasoa seuraavasta kappaleesta tulee "eka"-luokkaa.
-    gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) # Poistetaan syntyneet tuplaluokat.
-    gsub(/\r/, "", kirjoitettava) # Poistetaan väliaikaiset \r-merkinnät.
+    if (runoa) {
+	gsub(/<p/, "& class=\"eka\"", kirjoitettava) # Tehdään kaikista kappaleista eka-luokkaa.
+	gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) # Poistetaan syntyneet tuplaluokat.
+    } else {
+	gsub(/<p[^h>]*>/, "&\r", kirjoitettava) # Merkitään muiden kuin otsikkotason kappaleiden alut väliaikaisesti \r-merkillä seuraavia vaiheita varten.
+	gsub(/class=\"h[1-9]?\"[^\r]+<p/, "& class=\"eka\"", kirjoitettava) # Tehdään otsikkotasoa seuraavista kappaleista "eka"-luokkaa aina ensimmäiseen \r-merkintään saakka. Siis vain ensimmäisestä otsikkotasoa seuraavasta kappaleesta tulee "eka"-luokkaa.
+	gsub(/class=\"eka\"[^<>\"]+class=\"/, " class=\"eka", kirjoitettava) # Poistetaan syntyneet tuplaluokat.
+	gsub(/\r/, "", kirjoitettava) # Poistetaan väliaikaiset \r-merkinnät.
+    }
     gsub(/\n[\n]+/, "\n", kirjoitettava) # Pelkkiä \n-merkkejä sisältäviin kappaleisiin jää vain yksi \n-merkki.
     gsub(/<\/p>[\t\n\r\f\v]*</, "</p>\n<", kirjoitettava) # Poistetaan ylimääräisiä (sisällön ulkopuolisia) tyhjiä merkkejä. 
     return kirjoitettava
