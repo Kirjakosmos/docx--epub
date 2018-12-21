@@ -31,7 +31,8 @@
  ## teosnimi           - teoksen varsinainen (ei tiedoston-) nimi, saatetaan kaivaa metatiedoista, oletuksena tunniste-rimpsu.
  ## va_kansio          - Tänne menee purettu docx ja muut väliaikaiset tiedostot.
  ## kirjoituskansio    - Tänne menee menee valmistuvan epubin osaset.   
- ## kuvatunnus         - Teoksessa on jpg-muotoisia kuvia. Oletusmuotona on png.   
+ ## kuvatunnus         - Teoksessa on jpg-muotoisia kuvia. Oletusmuotona on png.
+ ## h2luetteloon       - Lisätäänkö otsikkotaso 2 sisällysluetteloon
   
   
   
@@ -41,6 +42,7 @@ epubversio=2
 muunnostila=0
 kirjoittajat="tuntematon"
 kuvatunnus="png"
+h2luetteloon=""
 while [ "$1" != "" ] 
 do
     case $1 in
@@ -81,6 +83,9 @@ do
 	    shift
 	    kuvatunnus=$1
 	    ;;
+        -h2 )
+	    h2luetteloon="joo"
+	    ;;
         * )   
             kohde=$1
     esac
@@ -101,7 +106,7 @@ kirjoituskansio=./muuntimen_kirjoituskansio.${$}$(date +%N)/ # Tänne menee mene
   # Puretaan ennalta määrätyt tyylit open xml -muodosta epubin css:ksi.
   ./mu_tyylit.awk kansio="${kirjoituskansio}/OEBPS/css" runo="${muunnostila}" ${va_kansio}word/styles.xml
 # Tehdään varsinaisesta tekstistä xhtml:ää.
-  ./mu_teksti.awk kansio="${kirjoituskansio}" kuvamuoto="${kuvatunnus}" otsikkokansio="${va_kansio}" kansikuva="${kansikuva:-""}" ${va_kansio}word/document.xml
+  ./mu_teksti.awk kansio="${kirjoituskansio}" kuvamuoto="${kuvatunnus}" otsikkokansio="${va_kansio}" kansikuva="${kansikuva:-""}" h2luetteloon="${h2luetteloon}" ${va_kansio}word/document.xml
   tunniste=um${$}t$(date +%s) # Yksilöivä tunnus teokselle (vrt. ISBN)
   if [ -f ${va_kansio}docProps/core.xml ];  # Tarkistetaan, onko metatietoja olemassa - joillain editoreilla ei synny. Varsinaisen epubin luova mu_nidonta tarvitsee jotkin metatiedot.
   then

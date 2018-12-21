@@ -89,10 +89,9 @@ NR == raportointi {
 }
 NF > 1       { 
     if (seuraavana_otsikko) {
-        if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "
-	}
+#        if (otsikko ~ "[^ ]$" && $1 ~ "^[^ ]") {otsikko = otsikko " "} # Tästä seuraa ylimääräisiä välilyöntejä otsikoihin.
         otsikko = otsikko "" $1 
-    } 
+    }
     kirjoitettava = kirjoitettava  $1 "\n"
     $0 = $2
 }
@@ -115,10 +114,26 @@ NF > 1       {
     }
     kirjoitettava = kirjoitettava "<p class=\"h1\">"
 }
+# Uusi luku tai väliotsikko
+/:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
+    if (h2luetteloon) {
+	    kirjoitettava = kirjoitettava "</p>"
+	    seuraavana_otsikko = "jep"
+	    kirjoitettava = hieronta(kirjoitettava, suljettavat)
+	    if (kirjoitettava ~ "[^ \n\r\t]+") {
+		tiedostonro++
+		luku_loppuu(tiedosto, suljettavat, kirjoitettava)
+		suljettavat=""
+		kirjoitettava=""
+		tiedosto = seuraava_luku_alkaa(tiedosto, tiedostonro, kansio)
+		kirjoitettava = kirjoitettava "<p class=\"h2\">"
+	    }
+    } else {
+	kirjoitettava = kirjoitettava "</p><p class=\"h2\">"
+    }
+}
 
 # väliotsikko
-/:pStyle w:val=\"Heading( )?2/ || /:pStyle w:val=\"[Oo]tsikko( )?2\"/  {
-    kirjoitettava = kirjoitettava "</p><p class=\"h2\">" }
 /:pStyle w:val=\"Heading( )?3/ || /:pStyle w:val=\"[Oo]tsikko( )?3\"/  {
     kirjoitettava = kirjoitettava "</p><p class=\"h3\">" }
 /:pStyle w:val=\"Heading( )?4/ || /:pStyle w:val=\"[Oo]tsikko( )?4\"/  {
@@ -168,7 +183,7 @@ NF > 1       {
 		match(rivi, "=\"(.)+\"")
 		listaformaatti = substr( rivi, RSTART +2, RLENGTH -3 )
 	    }
-	    if (rivi ~ /w:lvlText/ && listaformaatti == "bullet") # Numeroimattoman lisatn listamerkki
+	    if (rivi ~ /w:lvlText/ && listaformaatti == "bullet") # Numeroimattoman listan listamerkki
 	    {
 		match(rivi, "=\"(.)+\"")
 		merkki = substr( rivi, RSTART +2, RLENGTH -3 )
@@ -206,17 +221,17 @@ NF > 1       {
 /\/w:p$/      {
     kirjoitettava = kirjoitettava suljettavat "</p>"
     suljettavat = ""
-    if (seuraavana_otsikko && otsikko ~ /[^ \n\r\t]+$/) {
-        gsub("(\n)+", " ", otsikko)
-        otsikko = "\n" otsikko
-
-        print otsikko "" >> otsikkokansio "otsikot"
-        otsikko = seuraavana_otsikko = pakotettu_luku = ""
-    }
-    if (seuraavana_otsikko && pakotettu_luku) {
-	otsikko = otsikko "eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti."
-	print otsikko "" >> otsikkokansio "otsikot"
-        otsikko = seuraavana_otsikko = pakotettu_luku = ""
+    if (seuraavana_otsikko) {
+	if (otsikko ~ /[^ \n\r\t]+/) {
+	    gsub("(\n)+", " ", otsikko)
+	    otsikko = "\n" otsikko
+	    print otsikko "" >> otsikkokansio "otsikot"
+	    otsikko = seuraavana_otsikko = pakotettu_luku = ""
+	} else if (pakotettu_luku) {
+	    otsikko = otsikko "eI OtSIKKOa muTTA lukuVAihTUU SIlti NYT. Kangas kultainen kumahti."
+	    print otsikko "" >> otsikkokansio "otsikot"
+	    otsikko = seuraavana_otsikko = pakotettu_luku = ""
+	}
     }
 }
 
