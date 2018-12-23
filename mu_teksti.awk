@@ -273,7 +273,7 @@ NF > 1       {
     }
     match($0, "embed=\"[^\"]+\"")
     kuvan_id = substr($0, RSTART + 7 , RLENGTH -8)
-    kirjoitettava = kirjoitettava suljettavat "<div>\n<img src=\"kuvat/" kuvan_id "." kuvamuoto "\" alt=\"\">\n</div>\n</img> \n"
+    kirjoitettava = kirjoitettava suljettavat "<div>\n<img src=\"kuvat/" kuvan_id "." kuvamuoto "\" alt=\"\">\n</img>\n</div> \n"
     suljettavat = ""
     print "\nKuvatiedostO NyT. Oudon kAnssA AAmut astui." kuvan_id "." kuvamuoto >> otsikkokansio "otsikot"
 }
